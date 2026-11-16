@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mural de Oportunidades · Radar UFRGS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/mural.css">
+</head>
+<body>
+
+  <!-- Barra superior: montada por js/comum.js -->
+  <header class="topo" data-pagina="mural"></header>
+
+  <!-- ================= Cabeçalho da página ================= -->
+  <section class="cabecalho-pagina">
+    <div>
+      <h1>Mural de oportunidades</h1>
+      <p>Estágios, empregos e bolsas institucionais publicados por ofertantes autorizados pela universidade.</p>
+    </div>
+    <label class="busca">
+      <span class="sr-only">Buscar oportunidades</span>
+      <i class="ti ti-search"></i>
+      <input type="search" id="busca" placeholder="Buscar por cargo, empresa ou unidade">
+    </label>
+  </section>
+
+  <main class="layout">
+
+    <!-- ================= Filtros ================= -->
+    <aside class="filtros" id="painel-filtros" aria-label="Filtros">
+      <form id="form-filtros" autocomplete="off">
+        <div class="filtros-topo">
+          <h2><i class="ti ti-adjustments-horizontal"></i> Filtros</h2>
+          <button type="button" class="btn btn-texto" id="limpar-filtros">Limpar</button>
+        </div>
+
+        <div class="grupo">
+          <div class="grupo-titulo">Área de atuação</div>
+          <div class="chips" id="opcoes-area"></div>
+        </div>
+
+        <div class="grupo">
+          <div class="grupo-titulo">Tipo de vaga</div>
+          <div class="chips" id="opcoes-tipo"></div>
+        </div>
+
+        <div class="grupo">
+          <div class="grupo-titulo">
+            <label for="carga">Carga horária semanal</label>
+            <output id="carga-valor" for="carga">Qualquer</output>
+          </div>
+          <input type="range" id="carga" min="4" max="40" step="2" value="40">
+          <div class="escala"><span>4h</span><span>20h</span><span>40h</span></div>
+        </div>
+
+        <div class="grupo">
+          <div class="grupo-titulo">Dias em que estou disponível</div>
+          <div class="chips dias" id="opcoes-dias"></div>
+          <p class="grupo-ajuda">Mostra só vagas cujos dias de trabalho estão todos entre os selecionados.</p>
+        </div>
+
+        <div class="grupo">
+          <div class="grupo-titulo">Modalidade</div>
+          <div class="segmentado" role="radiogroup" aria-label="Modalidade">
+            <label><input type="radio" name="modalidade" value="presencial"><span>Presencial</span></label>
+            <label><input type="radio" name="modalidade" value="remota"><span>Remota</span></label>
+            <label><input type="radio" name="modalidade" value="qualquer" checked><span>Qualquer</span></label>
+          </div>
+        </div>
+
+        <div class="grupo" id="grupo-regiao">
+          <div class="grupo-titulo">Regiões de fácil acesso <span class="dica" id="regiao-dica">Qualquer</span></div>
+          <div class="lista-check" id="opcoes-regiao"></div>
+          <p class="grupo-ajuda">Sem região marcada, são exibidas vagas presenciais de todas as regiões.</p>
+        </div>
+
+        <div class="grupo">
+          <div class="grupo-titulo"><label for="remuneracao">Remuneração mínima (mensal)</label></div>
+          <div class="campo-moeda">
+            <span>R$</span>
+            <input type="number" id="remuneracao" min="0" step="50" placeholder="0" inputmode="numeric">
+          </div>
+        </div>
+      </form>
+    </aside>
+
+    <!-- ================= Resultados ================= -->
+    <section aria-live="polite">
+      <div class="barra-resultados">
+        <button class="btn btn-abrir-filtros" id="abrir-filtros" type="button" aria-controls="painel-filtros" aria-expanded="false">
+          <i class="ti ti-adjustments-horizontal"></i> Filtros <span id="qtd-filtros"></span>
+        </button>
+        <p class="contagem" id="contagem"></p>
+        <label class="ordenar">
+          Ordenar por
+          <select id="ordenar">
+            <option value="recentes">Mais recentes</option>
+            <option value="prazo">Prazo mais próximo</option>
+            <option value="remuneracao">Maior remuneração</option>
+            <option value="carga">Menor carga horária</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="aviso-perfil"></div>
+      <div class="filtros-ativos" id="filtros-ativos"></div>
+
+      <div class="grade" id="grade"></div>
+
+      <div class="vazio" id="vazio" hidden>
+        <div class="vazio-icone"><i class="ti ti-radar-off"></i></div>
+        <h2>Nenhuma oportunidade foi encontrada!</h2>
+        <p>Nenhuma vaga aberta atende a todos os filtros aplicados. Tente remover alguns deles:</p>
+        <div class="filtros-ativos" id="filtros-ativos-vazio"></div>
+        <button class="btn btn-primario" type="button" id="limpar-filtros-vazio">
+          <i class="ti ti-filter-off"></i> Remover todos os filtros
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= Detalhes da oportunidade ================= -->
+  <dialog class="detalhes" id="detalhes" aria-labelledby="det-titulo"></dialog>
+
+  <script src="js/comum.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/candidaturas-dados.js"></script>
+  <script src="js/mural.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+/* ==========================================================
+   Agenda de entrevistas — visão do ofertante
+   (reaproveita .bloco, .conversa, .legenda etc. de agenda.css)
+   ========================================================== */
+
+.vagas-abas { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.aba-vaga {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left;
+  padding: 12px 16px; min-width: 260px; cursor: pointer;
+  border: 1px solid var(--borda); border-radius: var(--raio-lg); background: var(--superficie);
+}
+.aba-vaga:hover { border-color: var(--borda-forte); }
+.aba-vaga[aria-selected="true"] { border-color: var(--cor-primaria); box-shadow: 0 0 0 3px var(--cor-primaria-clara); }
+.aba-vaga strong { font-size: 14px; }
+.aba-vaga span.sub { font-size: 12px; color: var(--texto-3); }
+
+.of-layout {
+  max-width: 1280px; margin: 0 auto; padding: 16px 24px 120px;
+  display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start;
+}
+.of-principal { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* ---------- Configuração ---------- */
+.config { display: grid; grid-template-columns: 2fr 1fr 1.2fr; gap: 16px; padding: 16px 20px; }
+.campo-linha label { display: block; font-size: 12px; font-weight: 600; color: var(--texto-2); margin-bottom: 6px; }
+.campo-linha select, .campo-linha input, .valor-fixo {
+  width: 100%; height: 40px; padding: 0 10px;
+  border: 1px solid var(--borda-forte); border-radius: var(--raio); background: var(--superficie);
+}
+.valor-fixo { display: flex; align-items: center; gap: 6px; background: var(--superficie-2); color: var(--texto-2); font-size: 14px; }
+.campo-linha.alterado select, .campo-linha.alterado input { border-color: #16a36a; box-shadow: 0 0 0 3px #e2f5ee; }
+
+/* ---------- Métricas ---------- */
+.metricas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0 10px; }
+.metrica { background: var(--superficie-2); border: 1px solid var(--borda); border-radius: var(--raio); padding: 10px 12px; }
+.metrica small { display: block; font-size: 12px; color: var(--texto-3); }
+.metrica strong { font-size: 22px; letter-spacing: -.02em; }
+.metrica.alerta { background: var(--alerta-bg); border-color: #f1d7a6; }
+.metrica.alerta strong, .metrica.alerta small { color: var(--alerta-tx); }
+#alerta-capacidade:empty { display: none; }
+#alerta-capacidade { margin-bottom: 10px; }
+
+/* ---------- Grade editável ---------- */
+.amostra.vazio { background: var(--superficie); border-color: var(--borda-forte); }
+.amostra.reservado { background: var(--cor-primaria); border-color: var(--cor-primaria); }
+.amostra.add { background: #e2f5ee; border: 1px dashed #16a36a; }
+.amostra.rem { background: repeating-linear-gradient(45deg, #fdecec, #fdecec 3px, #fff 3px, #fff 6px); border-color: #e59a9a; }
+.amostra.livre { background: var(--cor-primaria-clara); border-color: #9db5ef; }
+
+.grade-wrap { overflow-x: auto; }
+.grade-horarios {
+  display: grid; grid-template-columns: 56px repeat(5, minmax(96px, 1fr));
+  gap: 3px; user-select: none; min-width: 560px;
+}
+.gh-cab { text-align: center; padding: 6px 0 8px; position: sticky; top: 0; }
+.gh-cab strong { display: block; font-size: 13px; text-transform: capitalize; }
+.gh-cab small { font-size: 12px; color: var(--texto-3); }
+.gh-hora { font-size: 11px; color: var(--texto-3); text-align: right; padding-right: 6px; line-height: 30px; }
+.gh-hora.cheia { color: var(--texto-2); font-weight: 600; }
+
+.cel {
+  height: 30px; border-radius: 6px; cursor: pointer; padding: 0 6px;
+  border: 1px solid var(--borda); background: var(--superficie);
+  font-size: 11px; font-weight: 600; color: transparent;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  transition: background .08s;
+}
+.cel:hover { background: var(--cor-primaria-clara); color: var(--cor-primaria); border-color: #9db5ef; }
+.cel.livre { background: var(--cor-primaria-clara); border-color: #9db5ef; color: var(--cor-primaria); }
+.cel.livre:hover { background: #fdecec; border-color: #e59a9a; color: #9b2222; }
+.cel.reservado { background: var(--cor-primaria); border-color: var(--cor-primaria); color: #fff; }
+.cel.reservado:hover { background: var(--cor-primaria-escura); color: #fff; }
+.cel.reservado.estudante { background: #1d7a5a; border-color: #1d7a5a; }
+.cel.add { background: #e2f5ee; border: 1px dashed #16a36a; color: #0f6e56; }
+.cel.rem {
+  background: repeating-linear-gradient(45deg, #fdecec, #fdecec 4px, #fff 4px, #fff 8px);
+  border-color: #e59a9a; color: #9b2222; text-decoration: line-through;
+}
+.cel.novo { box-shadow: inset 3px 0 0 #16a36a; }
+
+/* ---------- Barra de publicação ---------- */
+.barra-publicar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 25;
+  background: var(--superficie); border-top: 1px solid var(--borda); box-shadow: 0 -6px 24px rgba(20,30,60,.08);
+  animation: subir .2s ease;
+}
+.barra-publicar[hidden] { display: none; }
+@keyframes subir { from { transform: translateY(100%); } }
+.barra-publicar-interno {
+  max-width: 1280px; margin: 0 auto; padding: 12px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  font-size: 14px;
+}
+.barra-publicar .mudanca-add { color: #0f6e56; font-weight: 600; }
+.barra-publicar .mudanca-rem { color: #9b2222; font-weight: 600; }
+
+/* ---------- Candidatos ---------- */
+.candidatos { position: sticky; top: 80px; padding: 16px; max-height: calc(100vh - 96px); overflow-y: auto; }
+.cand-topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.cand-topo h3 { font-size: 16px; }
+.cand {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 12px 0; border-top: 1px solid var(--borda);
+}
+.cand:first-child { border-top: 0; }
+.cand .avatar { width: 34px; height: 34px; font-size: 12px; flex: none; }
+.cand .avatar.estudante { background: #e2f5ee; color: #0f6e56; }
+.cand-info { flex: 1; min-width: 0; }
+.cand-nome { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+.cand-curso { font-size: 12px; color: var(--texto-3); margin-bottom: 6px; }
+.cand-acoes { display: flex; gap: 2px; flex: none; }
+.cand-acoes .btn { width: 32px; height: 32px; position: relative; }
+.cand-acoes .ponto {
+  position: absolute; top: 3px; right: 3px; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--perigo); border: 2px solid var(--superficie);
+}
+.selo-voce { font-size: 10px; font-weight: 700; background: #e2f5ee; color: #0f6e56; padding: 1px 6px; border-radius: 999px; }
+
+/* ---------- Estado inicial da vaga sem agenda ---------- */
+.sem-agenda { margin-bottom: 12px; }
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 1000px) {
+  .of-layout { grid-template-columns: 1fr; padding: 12px 16px 120px; }
+  .candidatos { position: static; max-height: none; }
+  .config { grid-template-columns: 1fr; }
+  .metricas { grid-template-columns: repeat(2, 1fr); }
+  .aba-vaga { min-width: 0; flex: 1 1 220px; }
+  .barra-publicar-interno { padding: 12px 16px; }
+}

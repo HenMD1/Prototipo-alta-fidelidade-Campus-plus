@@ -1,0 +1,118 @@
+/* ==========================================================
+   Mensagens — caixa de entrada (estudante e ofertante)
+   ========================================================== */
+
+.caixa {
+  max-width: 1280px; margin: 20px auto 24px; padding: 0 24px;
+  display: grid; grid-template-columns: 340px minmax(0, 1fr);
+  height: calc(100vh - 64px - 44px); min-height: 520px;
+}
+.caixa > * { background: var(--superficie); border: 1px solid var(--borda); }
+.conversas { border-radius: var(--raio-lg) 0 0 var(--raio-lg); display: flex; flex-direction: column; min-height: 0; }
+.janela { min-width: 0; border-left: 0; border-radius: 0 var(--raio-lg) var(--raio-lg) 0; display: flex; flex-direction: column; min-height: 0; }
+
+/* ---------- Lista ---------- */
+.conversas-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 16px 16px 10px; }
+.conversas-topo h1 { font-size: 20px; letter-spacing: -.01em; }
+.conversas-acoes { display: flex; gap: 4px; }
+.busca-conv { position: relative; margin: 0 16px 10px; }
+.busca-conv i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--texto-3); }
+.busca-conv input { width: 100%; height: 38px; padding: 0 10px 0 34px; border: 1px solid var(--borda-forte); border-radius: var(--raio); background: var(--superficie-2); }
+.filtro-conv { display: flex; gap: 6px; padding: 0 16px 10px; border-bottom: 1px solid var(--borda); }
+.filtro-conv button { border: 1px solid var(--borda-forte); background: var(--superficie); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 500; color: var(--texto-2); cursor: pointer; }
+.filtro-conv button[aria-selected="true"] { background: var(--cor-primaria-clara); border-color: var(--cor-primaria); color: var(--cor-primaria); }
+
+.lista-conv { flex: 1; overflow-y: auto; }
+.conv {
+  display: flex; gap: 12px; width: 100%; text-align: left; align-items: flex-start;
+  padding: 12px 16px; border: 0; border-bottom: 1px solid var(--borda); background: transparent; cursor: pointer;
+}
+.conv:hover { background: var(--superficie-2); }
+.conv.ativa { background: var(--cor-primaria-clara); box-shadow: inset 3px 0 0 var(--cor-primaria); }
+.av {
+  width: 42px; height: 42px; border-radius: 50%; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; color: #fff;
+}
+.av.quadrado { border-radius: 10px; }
+.conv-corpo { flex: 1; min-width: 0; }
+.conv-linha { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.conv-nome { font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conv-quando { font-size: 11px; color: var(--texto-3); flex: none; }
+.conv-vaga { font-size: 12px; color: var(--texto-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conv-previa { font-size: 13px; color: var(--texto-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
+.conv.nao-lida .conv-nome, .conv.nao-lida .conv-previa { color: var(--texto); font-weight: 600; }
+.conv .bolinha { width: 9px; height: 9px; border-radius: 50%; background: var(--cor-primaria); flex: none; margin-top: 6px; }
+.lista-vazia { padding: 32px 20px; text-align: center; color: var(--texto-3); font-size: 14px; }
+
+/* ---------- Janela ---------- */
+.janela-cab { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--borda); }
+.janela-cab .info { flex: 1; min-width: 0; }
+.janela-cab strong { display: block; font-size: 15px; }
+.janela-cab small { font-size: 12px; color: var(--texto-3); }
+.voltar-lista { display: none; }
+.contexto {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 8px 18px; background: var(--superficie-2); border-bottom: 1px solid var(--borda);
+  font-size: 13px; color: var(--texto-2);
+}
+.contexto a { font-weight: 600; margin-left: auto; display: inline-flex; align-items: center; gap: 4px; }
+
+.fio { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 8px; background: #f7f8fb; }
+.balao { max-width: min(75%, 520px); padding: 9px 13px; border-radius: 16px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
+.balao small { display: block; font-size: 11px; opacity: .65; margin-top: 3px; text-align: right; }
+.balao.outro { align-self: flex-start; background: var(--superficie); border: 1px solid var(--borda); border-bottom-left-radius: 4px; }
+.balao.eu { align-self: flex-end; background: var(--cor-primaria); color: #fff; border-bottom-right-radius: 4px; }
+.balao .selo-grupo { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; opacity: .8; margin-bottom: 3px; }
+.anexo {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin: 2px 0;
+  border-radius: 10px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35);
+}
+.balao.outro .anexo { background: var(--superficie-2); border-color: var(--borda); }
+.anexo i { font-size: 22px; }
+.anexo strong { display: block; font-size: 13px; }
+.anexo span { font-size: 11px; opacity: .75; }
+.digitando { align-self: flex-start; font-size: 13px; color: var(--texto-3); font-style: italic; }
+
+.compor { border-top: 1px solid var(--borda); padding: 10px 14px 14px; }
+.rapidas { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; }
+.rapidas button {
+  flex: none; font-size: 12px; padding: 5px 10px; border-radius: 999px; cursor: pointer;
+  border: 1px solid #c4d3f7; background: var(--cor-primaria-clara); color: var(--cor-primaria); white-space: nowrap;
+}
+.compor-linha { display: flex; gap: 8px; align-items: flex-end; }
+.compor-linha textarea {
+  flex: 1; resize: none; min-height: 44px; max-height: 140px; padding: 11px 12px;
+  border: 1px solid var(--borda-forte); border-radius: var(--raio); font: inherit; line-height: 1.4;
+}
+.compor-linha .btn { height: 44px; }
+.anexar { position: relative; }
+.anexar input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.anexar:focus-within .btn { outline: 2px solid var(--cor-primaria); outline-offset: 2px; }
+
+.vazio-janela { margin: auto; text-align: center; color: var(--texto-3); padding: 24px; }
+.vazio-janela i { font-size: 44px; display: block; margin-bottom: 8px; color: var(--borda-forte); }
+.vazio-janela strong { display: block; color: var(--texto-2); font-size: 16px; margin-bottom: 4px; }
+
+/* ---------- Modal de grupo ---------- */
+.grupos { display: flex; flex-direction: column; gap: 6px; }
+.grupos label {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px; cursor: pointer;
+  border: 1px solid var(--borda-forte); border-radius: var(--raio); font-size: 14px;
+}
+.grupos label:has(input:checked) { border-color: var(--cor-primaria); background: var(--cor-primaria-clara); }
+.grupos input { accent-color: var(--cor-primaria); width: 16px; height: 16px; }
+.grupos span { flex: 1; }
+.grupos small { color: var(--texto-3); font-size: 12px; }
+.grupos label.vazio { opacity: .55; }
+select.controle { width: 100%; height: 42px; padding: 0 10px; border: 1px solid var(--borda-forte); border-radius: var(--raio); background: var(--superficie); }
+
+/* ---------- Responsivo: lista OU conversa ---------- */
+@media (max-width: 800px) {
+  .caixa { grid-template-columns: minmax(0, 1fr); padding: 0; margin: 0; height: calc(100vh - 64px); }
+  .caixa > * { border-radius: 0 !important; border-left: 0; border-right: 0; }
+  .caixa.vendo-conversa .conversas { display: none; }
+  .caixa:not(.vendo-conversa) .janela { display: none; }
+  .voltar-lista { display: inline-flex; }
+  .balao { max-width: 85%; }
+}

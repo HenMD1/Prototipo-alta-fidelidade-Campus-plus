@@ -1,0 +1,123 @@
+/* ==========================================================
+   Entrada: login, solicitação de acesso e recuperação de senha
+   ========================================================== */
+
+.pagina-login { background: var(--fundo); }
+.login-layout { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+
+/* ---------- Apresentação ---------- */
+.hero {
+  background: #1d3f99;
+  background-image: radial-gradient(circle at 85% 15%, rgba(255,255,255,.10) 0 120px, transparent 121px),
+                    radial-gradient(circle at 85% 15%, rgba(255,255,255,.06) 0 220px, transparent 221px),
+                    radial-gradient(circle at 85% 15%, rgba(255,255,255,.04) 0 330px, transparent 331px);
+  color: #fff; padding: 40px 56px; display: flex; flex-direction: column; gap: 36px;
+}
+.marca-clara { color: #fff; }
+.marca-clara .marca-sub { color: rgba(255,255,255,.7); }
+.hero-texto { max-width: 560px; margin-top: auto; }
+.hero h1 { font-size: 40px; line-height: 1.12; letter-spacing: -.03em; font-weight: 700; }
+.hero-texto p { margin-top: 14px; font-size: 16px; color: rgba(255,255,255,.82); line-height: 1.6; }
+.beneficios { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; max-width: 640px; }
+.beneficios li { display: flex; gap: 12px; font-size: 14px; color: rgba(255,255,255,.78); line-height: 1.45; }
+.beneficios i {
+  flex: none; width: 36px; height: 36px; border-radius: 10px; font-size: 19px;
+  background: rgba(255,255,255,.12); display: flex; align-items: center; justify-content: center; color: #fff;
+}
+.beneficios b { display: block; color: #fff; font-weight: 600; margin-bottom: 2px; }
+.numeros { display: flex; gap: 36px; margin-bottom: auto; flex-wrap: wrap; }
+.numeros strong { display: block; font-size: 30px; letter-spacing: -.02em; }
+.numeros span { font-size: 13px; color: rgba(255,255,255,.7); }
+
+/* ---------- Cartão de acesso ---------- */
+.acesso { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; gap: 16px; }
+.cartao-acesso {
+  width: 100%; max-width: 440px; background: var(--superficie);
+  border: 1px solid var(--borda); border-radius: 18px; box-shadow: var(--sombra); padding: 30px 32px;
+}
+.cartao-acesso h2 { font-size: 24px; letter-spacing: -.02em; }
+.cartao-acesso > p.sub { color: var(--texto-2); margin: 6px 0 20px; font-size: 14px; }
+.voltar-acesso { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500; margin-bottom: 12px; background: none; border: 0; color: var(--cor-primaria); cursor: pointer; padding: 0; }
+
+.perfil-abas { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: var(--superficie-2); border: 1px solid var(--borda); border-radius: 12px; margin-bottom: 20px; }
+.perfil-abas button {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  border: 0; background: transparent; border-radius: 9px; padding: 10px 0;
+  font-weight: 600; font-size: 14px; color: var(--texto-2); cursor: pointer;
+}
+.perfil-abas button[aria-selected="true"] { background: var(--superficie); color: var(--cor-primaria); box-shadow: 0 1px 3px rgba(20,30,60,.12); }
+
+.form-acesso { display: flex; flex-direction: column; gap: 14px; }
+.campo-acesso label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.campo-acesso label a, .campo-acesso label button { font-weight: 500; font-size: 13px; background: none; border: 0; color: var(--cor-primaria); cursor: pointer; padding: 0; }
+.entrada { position: relative; }
+.entrada > i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--texto-3); font-size: 18px; pointer-events: none; }
+.entrada input {
+  width: 100%; height: 46px; padding: 0 44px 0 40px;
+  border: 1px solid var(--borda-forte); border-radius: var(--raio); background: var(--superficie); font-size: 15px;
+}
+.entrada input:focus-visible { outline: 2px solid var(--cor-primaria); outline-offset: 1px; }
+.entrada .ver-senha { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; border: 0; background: transparent; color: var(--texto-3); cursor: pointer; border-radius: 8px; }
+.entrada .ver-senha:hover { background: var(--superficie-2); color: var(--texto); }
+.campo-acesso .ajuda { font-size: 12px; color: var(--texto-3); margin-top: 5px; }
+.campo-acesso .erro-campo { font-size: 13px; color: var(--perigo); margin-top: 5px; display: flex; gap: 4px; align-items: flex-start; }
+.campo-acesso.invalido input { border-color: var(--perigo); box-shadow: 0 0 0 3px #fdecec; }
+.lembrar { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--texto-2); cursor: pointer; }
+.lembrar input { width: 16px; height: 16px; accent-color: var(--cor-primaria); }
+
+.btn-grande { height: 48px; font-size: 15px; width: 100%; }
+.girando { animation: girar .8s linear infinite; display: inline-block; }
+@keyframes girar { to { transform: rotate(360deg); } }
+
+.erro-geral { display: flex; gap: 8px; padding: 10px 12px; border-radius: var(--raio); background: #fdecec; border: 1px solid #f5c4c4; color: #9b2222; font-size: 14px; }
+.erro-geral:empty { display: none; }
+
+.divisor { display: flex; align-items: center; gap: 10px; color: var(--texto-3); font-size: 12px; margin: 4px 0; }
+.divisor::before, .divisor::after { content: ""; flex: 1; height: 1px; background: var(--borda); }
+.demo-acesso { width: 100%; }
+.rodape-acesso { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--borda); font-size: 14px; color: var(--texto-2); text-align: center; }
+.rodape-acesso button { background: none; border: 0; color: var(--cor-primaria); font-weight: 600; cursor: pointer; padding: 0; font-size: 14px; }
+
+.info-acesso { display: flex; gap: 10px; padding: 12px 14px; border-radius: var(--raio); background: #eef3fe; border: 1px solid #c9d7fa; color: #1c3f8f; font-size: 13px; line-height: 1.45; }
+.info-acesso i { font-size: 18px; flex: none; }
+
+.sucesso-acesso { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px 0; }
+.sucesso-acesso .ic { width: 68px; height: 68px; border-radius: 50%; background: var(--sucesso-bg); color: var(--sucesso-tx); display: flex; align-items: center; justify-content: center; font-size: 34px; }
+.sucesso-acesso p { color: var(--texto-2); font-size: 14px; }
+.passos-analise { text-align: left; width: 100%; margin: 6px 0 4px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.passos-analise li { display: flex; gap: 10px; align-items: flex-start; }
+.passos-analise i { color: var(--cor-primaria); font-size: 18px; }
+
+.aviso-prototipo { font-size: 12px; color: var(--texto-3); display: flex; align-items: center; gap: 6px; }
+
+@media (max-width: 960px) {
+  .login-layout { grid-template-columns: 1fr; }
+  .hero { padding: 28px 20px; gap: 22px; }
+  .hero h1 { font-size: 28px; }
+  .beneficios { grid-template-columns: 1fr; gap: 12px; }
+  .beneficios li:nth-child(n+3) { display: none; }
+  .acesso { padding: 20px 16px 28px; justify-content: flex-start; order: -1; }
+  .hero .marca { display: none; }
+  .hero-texto { margin-top: 0; }
+  .cartao-acesso { padding: 24px 20px; }
+}
+
+/* ---------- Contas de teste ("do zero") ---------- */
+.bloco-teste {
+  margin-top: 16px; padding: 14px 16px; border-radius: var(--raio);
+  background: #f7f2fe; border: 1px dashed #cdb6f0; display: flex; flex-direction: column; gap: 6px; align-items: flex-start;
+}
+.bloco-teste strong { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #5a2f99; }
+.bloco-teste p { font-size: 13px; color: var(--texto-2); }
+.bloco-teste .btn-texto { color: #6b3fa0; }
+.atalhos-teste { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12px; color: var(--texto-3); }
+.atalhos-teste .btn { height: 32px; font-size: 13px; padding: 0 10px; }
+.tipo-ofertante { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; }
+.tipo-ofertante label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.tipo-ofertante input { accent-color: var(--cor-primaria); width: 16px; height: 16px; }
+.entrada select {
+  width: 100%; height: 46px; padding: 0 12px 0 40px; font-size: 15px;
+  border: 1px solid var(--borda-forte); border-radius: var(--raio); background: var(--superficie);
+}
+.campo-acesso.invalido select { border-color: var(--perigo); box-shadow: 0 0 0 3px #fdecec; }
+.link-inline { background: none; border: 0; padding: 0; color: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; font-size: inherit; }

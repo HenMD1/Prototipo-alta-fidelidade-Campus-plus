@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minhas candidaturas · Radar UFRGS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/agenda.css">
+  <link rel="stylesheet" href="css/candidaturas.css">
+</head>
+<body>
+
+  <!-- Barra superior: montada por js/comum.js -->
+  <header class="topo" data-pagina="candidaturas"></header>
+
+  <section class="cabecalho-pagina">
+    <h1>Minhas candidaturas</h1>
+    <p>Acompanhe cada etapa, envie documentos e assine o termo de compromisso sem sair do Radar.</p>
+    <div class="metricas-cand" id="metricas"></div>
+  </section>
+
+  <main class="agenda-layout">
+    <aside class="lista-cand" aria-label="Candidaturas">
+      <div class="abas" role="tablist" aria-label="Filtrar candidaturas">
+        <button role="tab" data-aba="andamento" aria-selected="true">Em andamento <span id="qtd-andamento"></span></button>
+        <button role="tab" data-aba="encerradas" aria-selected="false">Encerradas <span id="qtd-encerradas"></span></button>
+      </div>
+      <div id="lista" class="lista-itens"></div>
+    </aside>
+
+    <section class="detalhe" id="detalhe" aria-live="polite"></section>
+  </main>
+
+  <!-- Assinatura do termo de compromisso -->
+  <dialog class="modal modal-termo" id="modal-termo" aria-labelledby="mt-titulo">
+    <div class="modal-corpo">
+      <h2 id="mt-titulo">Termo de compromisso</h2>
+      <div class="documento" id="mt-documento"></div>
+      <div id="mt-assinar">
+        <label class="concordo"><input type="checkbox" id="mt-concordo"> Li o termo e concordo com as condições do estágio.</label>
+        <p class="erro" id="mt-erro" style="color:var(--perigo);font-size:13px;margin-top:4px"></p>
+      </div>
+    </div>
+    <div class="modal-rodape" id="mt-rodape"></div>
+  </dialog>
+
+  <!-- Retirar candidatura -->
+  <dialog class="modal" id="modal-retirar" aria-labelledby="mr-titulo">
+    <div class="modal-corpo">
+      <h2 id="mr-titulo">Retirar candidatura?</h2>
+      <p>Você sai do processo seletivo desta vaga. Os documentos enviados deixam de ficar visíveis para o ofertante.</p>
+      <div class="campo">
+        <label for="mr-motivo">Motivo (opcional)</label>
+        <textarea id="mr-motivo" placeholder="Encontrei outra oportunidade."></textarea>
+      </div>
+    </div>
+    <div class="modal-rodape">
+      <button class="btn" data-fechar>Voltar</button>
+      <button class="btn btn-perigo" id="mr-confirmar"><i class="ti ti-trash"></i> Retirar candidatura</button>
+    </div>
+  </dialog>
+
+  <!-- Simulação para a apresentação -->
+  <div class="demo">
+    <div class="demo-painel" id="demo-painel" hidden>
+      <p>Simula decisões do ofertante e da universidade na candidatura aberta.</p>
+      <button class="evento" data-evento="avancar"><i class="ti ti-player-track-next"></i><span>Ofertante avança a etapa<small>Pré-seleção, entrevista e aprovação</small></span></button>
+      <button class="evento" data-evento="recusar-doc"><i class="ti ti-file-x"></i><span>Ofertante recusa um documento<small>Notificação de documento faltante</small></span></button>
+      <button class="evento" data-evento="nao-selecionar"><i class="ti ti-mood-empty"></i><span>Ofertante não seleciona<small>Encerra com retorno ao candidato</small></span></button>
+      <hr>
+      <button class="evento" data-evento="reiniciar"><i class="ti ti-refresh"></i><span>Reiniciar demonstração</span></button>
+    </div>
+    <button class="btn demo-botao" id="demo-botao" aria-expanded="false" aria-controls="demo-painel"><i class="ti ti-player-play"></i> Simular eventos</button>
+  </div>
+
+  <script src="js/comum.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/agenda-dados.js"></script>
+  <script src="js/candidaturas-dados.js"></script>
+  <script src="js/candidaturas.js"></script>
+</body>
+</html>

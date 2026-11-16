@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrevistas · Radar UFRGS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/agenda.css">
+</head>
+<body>
+
+  <!-- Barra superior: montada por js/comum.js -->
+  <header class="topo" data-pagina="entrevistas"></header>
+
+  <section class="cabecalho-pagina">
+    <h1>Entrevistas</h1>
+    <p>Escolha um horário na agenda de cada ofertante que aprovou você na pré-seleção.</p>
+  </section>
+
+  <main class="agenda-layout">
+    <!-- Candidaturas aprovadas na pré-seleção -->
+    <aside class="lista-cand" aria-label="Candidaturas aprovadas">
+      <h2>Aprovadas na pré-seleção</h2>
+      <div id="lista" style="display:flex;flex-direction:column;gap:8px"></div>
+    </aside>
+
+    <!-- Detalhe da candidatura selecionada -->
+    <section class="detalhe" id="detalhe" aria-live="polite"></section>
+  </main>
+
+  <!-- ================= Conversa com o ofertante ================= -->
+  <div class="fundo-gaveta" id="fundo-gaveta" hidden></div>
+  <aside class="conversa" id="conversa" aria-label="Conversa com o ofertante" aria-hidden="true">
+    <div class="conversa-cab" id="conversa-cab"></div>
+    <div class="mensagens" id="mensagens"></div>
+    <div class="respostas-rapidas" id="respostas-rapidas"></div>
+    <form class="conversa-form" id="conversa-form">
+      <label class="sr-only" for="conversa-texto">Mensagem</label>
+      <textarea id="conversa-texto" placeholder="Escreva uma mensagem"></textarea>
+      <button class="btn btn-primario btn-icone" type="submit" aria-label="Enviar"><i class="ti ti-send" style="font-size:18px"></i></button>
+    </form>
+  </aside>
+
+  <!-- ================= Confirmar horário ================= -->
+  <dialog class="modal" id="modal-confirmar" aria-labelledby="mc-titulo">
+    <div class="modal-corpo">
+      <h2 id="mc-titulo">Confirmar entrevista?</h2>
+      <div class="resumo-entrevista" id="mc-resumo"></div>
+      <p style="font-size:14px">Ao confirmar, o horário sai da agenda dos outros candidatos e o ofertante é notificado.</p>
+    </div>
+    <div class="modal-rodape">
+      <button class="btn" data-fechar>Voltar</button>
+      <button class="btn btn-primario" id="mc-confirmar"><i class="ti ti-calendar-check"></i> Confirmar entrevista</button>
+    </div>
+  </dialog>
+
+  <!-- ================= Desistir da vaga ================= -->
+  <dialog class="modal" id="modal-desistir" aria-labelledby="md-titulo">
+    <form class="modal-corpo" id="form-desistir" novalidate>
+      <h2 id="md-titulo">Desistir desta vaga?</h2>
+      <p>Sua candidatura sai da lista de aprovados e o horário reservado volta para a agenda. O ofertante recebe sua mensagem pela conversa.</p>
+      <div class="campo">
+        <label for="md-motivo">Mensagem ao ofertante</label>
+        <textarea id="md-motivo" placeholder="Fui aprovado em outra vaga com horário incompatível."></textarea>
+        <p class="erro" id="md-erro"></p>
+      </div>
+    </form>
+    <div class="modal-rodape">
+      <button class="btn" data-fechar>Voltar</button>
+      <button class="btn btn-perigo" id="md-confirmar"><i class="ti ti-door-exit"></i> Desistir da vaga</button>
+    </div>
+  </dialog>
+
+  <!-- ================= Simulação para a apresentação ================= -->
+  <div class="demo">
+    <div class="demo-painel" id="demo-painel" hidden>
+      <p>Simula ações do ofertante, de outros candidatos e do sistema na candidatura aberta, para demonstrar os fluxos alternativos.</p>
+      <button class="evento" data-evento="reserva"><i class="ti ti-user-plus"></i><span>Outro candidato reserva um horário<small>Critério: notificar alterações por outros estudantes</small></span></button>
+      <button class="evento" data-evento="altera"><i class="ti ti-calendar-cog"></i><span>Ofertante altera a agenda<small>Fluxo alternativo 3 · CT03</small></span></button>
+      <button class="evento" data-evento="cancela"><i class="ti ti-calendar-x"></i><span>Ofertante cancela a entrevista<small>Fluxo alternativo 5</small></span></button>
+      <button class="evento" data-evento="expira"><i class="ti ti-hourglass-empty"></i><span>Prazo de escolha expira<small>Fluxo alternativo 6 · CT07</small></span></button>
+      <hr>
+      <button class="evento" data-evento="reiniciar"><i class="ti ti-refresh"></i><span>Reiniciar demonstração</span></button>
+    </div>
+    <button class="btn demo-botao" id="demo-botao" aria-expanded="false" aria-controls="demo-painel"><i class="ti ti-player-play"></i> Simular eventos</button>
+  </div>
+
+  <script src="js/comum.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/agenda-dados.js"></script>
+  <script src="js/agenda.js"></script>
+</body>
+</html>

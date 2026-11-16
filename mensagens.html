@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mensagens · Radar UFRGS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/mensagens.css">
+</head>
+<body>
+
+  <!-- Barra superior: montada por js/comum.js. O perfil vem do endereço (?perfil=ofertante). -->
+  <header class="topo" data-pagina="mensagens"></header>
+  <script>
+    document.querySelector("header.topo").dataset.perfil =
+      new URLSearchParams(location.search).get("perfil") === "ofertante" ? "ofertante" : "estudante";
+  </script>
+
+  <main class="caixa" id="caixa">
+    <!-- Lista de conversas -->
+    <aside class="conversas" aria-label="Conversas">
+      <div class="conversas-topo">
+        <h1>Mensagens</h1>
+        <div class="conversas-acoes" id="acoes-topo"></div>
+      </div>
+      <label class="busca-conv">
+        <span class="sr-only">Buscar conversas</span>
+        <i class="ti ti-search"></i>
+        <input type="search" id="busca" placeholder="Buscar por nome ou vaga">
+      </label>
+      <div class="filtro-conv" role="tablist" aria-label="Filtrar conversas">
+        <button role="tab" data-filtro="todas" aria-selected="true">Todas</button>
+        <button role="tab" data-filtro="nao-lidas" aria-selected="false">Não lidas <span id="qtd-nao-lidas"></span></button>
+      </div>
+      <div class="lista-conv" id="lista" role="list"></div>
+    </aside>
+
+    <!-- Conversa aberta -->
+    <section class="janela" id="janela" aria-live="polite"></section>
+  </main>
+
+  <!-- Nova conversa (ofertante) -->
+  <dialog class="modal" id="modal-nova" aria-labelledby="mn-titulo">
+    <div class="modal-corpo">
+      <h2 id="mn-titulo">Nova conversa</h2>
+      <div class="campo">
+        <label for="mn-candidato">Candidato</label>
+        <select id="mn-candidato" class="controle"></select>
+        <p class="erro" id="mn-erro"></p>
+      </div>
+    </div>
+    <div class="modal-rodape">
+      <button class="btn" data-fechar>Cancelar</button>
+      <button class="btn btn-primario" id="mn-abrir">Abrir conversa</button>
+    </div>
+  </dialog>
+
+  <!-- Mensagem para grupo (ofertante) -->
+  <dialog class="modal" id="modal-grupo" aria-labelledby="mg-titulo">
+    <form class="modal-corpo" id="form-grupo" novalidate>
+      <h2 id="mg-titulo">Mensagem para grupo</h2>
+      <p>Envie o mesmo aviso para vários candidatos de uma vaga. Cada um recebe a mensagem na própria conversa.</p>
+      <div class="campo">
+        <label for="mg-vaga">Vaga</label>
+        <select id="mg-vaga" class="controle"></select>
+      </div>
+      <div class="campo">
+        <label>Destinatários</label>
+        <div class="grupos" id="mg-grupos" role="radiogroup" aria-label="Destinatários"></div>
+      </div>
+      <div class="campo">
+        <label for="mg-texto">Mensagem</label>
+        <textarea id="mg-texto" placeholder="Lembrete: a agenda de entrevistas fecha na sexta-feira."></textarea>
+        <p class="erro" id="mg-erro"></p>
+      </div>
+    </form>
+    <div class="modal-rodape">
+      <button class="btn" data-fechar>Cancelar</button>
+      <button class="btn btn-primario" id="mg-enviar"><i class="ti ti-send"></i> <span id="mg-rotulo">Enviar</span></button>
+    </div>
+  </dialog>
+
+  <script src="js/comum.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/agenda-dados.js"></script>
+  <script src="js/ofertante-dados.js"></script>
+  <script src="js/mensagens.js"></script>
+</body>
+</html>

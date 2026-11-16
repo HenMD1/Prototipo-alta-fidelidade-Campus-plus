@@ -1,0 +1,56 @@
+/* ==========================================================
+   Meu perfil / cadastro estudantil
+   (reaproveita .campo-form, .grade-campos e .chips)
+   ========================================================== */
+
+.perfil-form { max-width: 860px; display: flex; flex-direction: column; gap: 16px; }
+.secao-perfil { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-lg); padding: 22px 24px; }
+.secao-perfil h2 { font-size: 17px; display: flex; align-items: center; gap: 8px; }
+.secao-perfil h2 i { color: var(--cor-primaria); font-size: 20px; }
+.secao-perfil > p { color: var(--texto-2); font-size: 14px; margin: 4px 0 16px; }
+
+.boas-vindas {
+  display: flex; gap: 16px; align-items: center; padding: 18px 20px; border-radius: var(--raio-lg);
+  background: #eef3fe; border: 1px solid #c9d7fa; color: #1c3f8f;
+}
+.boas-vindas i { font-size: 34px; }
+.boas-vindas strong { display: block; font-size: 17px; }
+.boas-vindas p { font-size: 14px; margin-top: 2px; }
+
+.campo-fixo { height: 42px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid var(--borda); border-radius: var(--raio); background: var(--superficie-2); color: var(--texto-2); font-size: 14px; }
+.faixa { display: flex; align-items: center; gap: 12px; }
+.faixa input[type="range"] { flex: 1; accent-color: var(--cor-primaria); }
+.faixa output { min-width: 72px; text-align: right; font-weight: 600; color: var(--cor-primaria); }
+
+.anexo-cv { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px dashed var(--borda-forte); border-radius: var(--raio); }
+.anexo-cv i.ic { font-size: 26px; color: var(--texto-3); }
+.anexo-cv .nome { flex: 1; font-size: 14px; }
+.anexo-cv .nome small { display: block; color: var(--texto-3); font-size: 12px; }
+.anexo-cv label { position: relative; }
+.anexo-cv input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.anexo-cv label:focus-within .btn { outline: 2px solid var(--cor-primaria); outline-offset: 2px; }
+
+.barra-salvar {
+  position: sticky; bottom: 0; z-index: 5;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 14px 20px; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-lg);
+  box-shadow: 0 -6px 24px rgba(20,30,60,.06);
+}
+.barra-salvar span { font-size: 14px; color: var(--texto-2); }
+.barra-salvar .dir { display: flex; gap: 8px; margin-left: auto; }
+
+/* ---------- Grade de aulas ---------- */
+.aulas { display: flex; flex-direction: column; gap: 6px; }
+.aula-cab, .aula-linha { display: grid; grid-template-columns: 110px 104px 104px minmax(0, 1fr) 38px; gap: 8px; align-items: center; }
+.aula-cab span { font-size: 12px; font-weight: 600; color: var(--texto-3); }
+.aula-linha select, .aula-linha input {
+  width: 100%; min-width: 0; height: 40px; padding: 0 10px; font: inherit;
+  border: 1px solid var(--borda-forte); border-radius: var(--raio); background: var(--superficie);
+}
+.aulas.invalido .aula-linha input[type="time"] { border-color: var(--perigo); }
+.aulas-acoes { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+@media (max-width: 640px) {
+  .aula-cab { display: none; }
+  .aula-linha { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 38px; padding-bottom: 8px; border-bottom: 1px solid var(--borda); }
+  .aula-linha input[type="text"] { grid-column: 1 / 4; grid-row: 2; }
+}

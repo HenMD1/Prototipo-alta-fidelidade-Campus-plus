@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agenda de entrevistas · Radar UFRGS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/agenda.css">
+  <link rel="stylesheet" href="css/ofertante.css">
+</head>
+<body>
+
+  <!-- Barra superior: montada por js/comum.js -->
+  <header class="topo" data-perfil="ofertante" data-pagina="agenda"></header>
+
+  <section class="cabecalho-pagina">
+    <h1>Agenda de entrevistas</h1>
+    <p>Marque os horários em que você pode entrevistar os candidatos aprovados na pré-seleção.</p>
+    <div class="vagas-abas" id="vagas-abas" role="tablist" aria-label="Vagas"></div>
+  </section>
+
+  <main class="of-layout">
+    <div class="of-principal">
+      <!-- Configuração da entrevista -->
+      <section class="bloco config" aria-label="Configuração da entrevista">
+        <div class="campo-linha">
+          <label for="cfg-formato">Formato e local</label>
+          <select id="cfg-formato"></select>
+        </div>
+        <div class="campo-linha">
+          <label>Duração</label>
+          <div class="valor-fixo"><i class="ti ti-clock"></i> 30 min</div>
+        </div>
+        <div class="campo-linha">
+          <label for="cfg-prazo">Candidatos escolhem até</label>
+          <input type="date" id="cfg-prazo">
+        </div>
+      </section>
+
+      <!-- Editor da agenda -->
+      <section class="bloco" aria-label="Horários disponíveis">
+        <div class="agenda-topo">
+          <div>
+            <h3>Horários disponíveis</h3>
+            <p class="prazo-escolha"><i class="ti ti-pointer"></i>Clique ou arraste sobre a grade para abrir ou fechar horários. Clique num horário reservado para ver a entrevista.</p>
+          </div>
+          <div class="nav-semana">
+            <button class="btn btn-icone" id="sem-ant" aria-label="Semana anterior"><i class="ti ti-chevron-left"></i></button>
+            <span id="sem-rotulo"></span>
+            <button class="btn btn-icone" id="sem-prox" aria-label="Próxima semana"><i class="ti ti-chevron-right"></i></button>
+          </div>
+        </div>
+
+        <div class="metricas" id="metricas"></div>
+        <div id="alerta-capacidade"></div>
+
+        <div class="legenda">
+          <span><span class="amostra vazio"></span>Fechado</span>
+          <span><span class="amostra livre"></span>Aberto</span>
+          <span><span class="amostra reservado"></span>Reservado</span>
+          <span><span class="amostra add"></span>Será aberto</span>
+          <span><span class="amostra rem"></span>Será fechado</span>
+        </div>
+
+        <div class="grade-wrap">
+          <div class="grade-horarios" id="grade" role="grid" aria-label="Grade de horários da semana"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Candidatos aprovados -->
+    <aside class="bloco candidatos" aria-label="Candidatos aprovados">
+      <div class="cand-topo">
+        <h3>Candidatos aprovados</h3>
+        <span class="etiqueta neutra" id="cand-qtd"></span>
+      </div>
+      <div id="lista-candidatos"></div>
+    </aside>
+  </main>
+
+  <!-- Barra de publicação (aparece quando há mudanças) -->
+  <div class="barra-publicar" id="barra-publicar" hidden>
+    <div class="barra-publicar-interno">
+      <span id="resumo-mudancas"></span>
+      <div style="display:flex;gap:8px">
+        <button class="btn" id="descartar">Descartar</button>
+        <button class="btn btn-primario" id="publicar"><i class="ti ti-send"></i> <span id="publicar-rotulo">Publicar agenda</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entrevista reservada -->
+  <dialog class="modal" id="modal-reserva" aria-labelledby="mr-titulo">
+    <div class="modal-corpo">
+      <h2 id="mr-titulo">Entrevista marcada</h2>
+      <div class="resumo-entrevista" id="mr-resumo"></div>
+      <div class="campo" id="mr-cancelar" hidden>
+        <label for="mr-motivo">Explique o cancelamento ao candidato</label>
+        <textarea id="mr-motivo" placeholder="Tivemos um imprevisto na equipe e precisamos remarcar."></textarea>
+        <p class="erro" id="mr-erro"></p>
+        <p style="font-size:13px">O horário é retirado da agenda e o candidato é notificado para escolher outro.</p>
+      </div>
+    </div>
+    <div class="modal-rodape" id="mr-rodape"></div>
+  </dialog>
+
+  <!-- Conversa com candidato -->
+  <div class="fundo-gaveta" id="fundo-gaveta" hidden></div>
+  <aside class="conversa" id="conversa" aria-label="Conversa com o candidato" aria-hidden="true">
+    <div class="conversa-cab" id="conversa-cab"></div>
+    <div class="mensagens" id="mensagens"></div>
+    <div class="respostas-rapidas" id="respostas-rapidas"></div>
+    <form class="conversa-form" id="conversa-form">
+      <label class="sr-only" for="conversa-texto">Mensagem</label>
+      <textarea id="conversa-texto" placeholder="Escreva uma mensagem"></textarea>
+      <button class="btn btn-primario btn-icone" type="submit" aria-label="Enviar"><i class="ti ti-send" style="font-size:18px"></i></button>
+    </form>
+  </aside>
+
+  <script src="js/comum.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/agenda-dados.js"></script>
+  <script src="js/ofertante-dados.js"></script>
+  <script src="js/agenda-ofertante.js"></script>
+</body>
+</html>

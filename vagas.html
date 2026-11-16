@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minhas vagas · Radar UFRGS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/mural.css">
+  <link rel="stylesheet" href="css/vagas.css">
+</head>
+<body>
+
+  <!-- Barra superior: montada por js/comum.js -->
+  <header class="topo" data-perfil="ofertante" data-pagina="vagas"></header>
+
+  <!-- Conteúdo trocado por js/vagas.js: lista de vagas ou formulário -->
+  <div id="tela"></div>
+
+  <!-- Encerrar inscrições -->
+  <dialog class="modal" id="modal-encerrar" aria-labelledby="me-titulo">
+    <div class="modal-corpo">
+      <h2 id="me-titulo">Encerrar inscrições?</h2>
+      <p id="me-texto"></p>
+      <div class="campo">
+        <label for="me-motivo">Motivo do encerramento</label>
+        <select id="me-motivo" class="controle">
+          <option value="">Selecione</option>
+          <option>Todas as vagas foram preenchidas.</option>
+          <option>Número suficiente de candidatos inscritos.</option>
+          <option>O processo seletivo foi cancelado.</option>
+          <option value="outro">Outro motivo</option>
+        </select>
+        <textarea id="me-outro" placeholder="Explique o motivo aos estudantes" hidden style="margin-top:8px"></textarea>
+        <p class="erro" id="me-erro"></p>
+      </div>
+      <p style="font-size:13px">A vaga sai do mural. Quem abrir a página dela verá que as inscrições foram encerradas e o motivo.</p>
+    </div>
+    <div class="modal-rodape">
+      <button class="btn" data-fechar>Voltar</button>
+      <button class="btn btn-perigo" id="me-confirmar"><i class="ti ti-lock"></i> Encerrar inscrições</button>
+    </div>
+  </dialog>
+
+  <!-- Confirmar alterações de vaga publicada -->
+  <dialog class="modal" id="modal-alteracoes" aria-labelledby="ma-titulo">
+    <div class="modal-corpo">
+      <h2 id="ma-titulo">Salvar alterações?</h2>
+      <p id="ma-texto"></p>
+      <ul class="lista-mudancas" id="ma-lista"></ul>
+    </div>
+    <div class="modal-rodape">
+      <button class="btn" data-fechar>Continuar editando</button>
+      <button class="btn btn-primario" id="ma-confirmar"><i class="ti ti-device-floppy"></i> Salvar e notificar</button>
+    </div>
+  </dialog>
+
+  <script src="js/comum.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/agenda-dados.js"></script>
+  <script src="js/ofertante-dados.js"></script>
+  <script src="js/candidaturas-dados.js"></script>
+  <script src="js/candidatos-dados.js"></script>
+  <script src="js/vagas.js"></script>
+</body>
+</html>

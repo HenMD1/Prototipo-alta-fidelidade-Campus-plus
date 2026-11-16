@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidatos · Radar UFRGS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/candidatos.css">
+</head>
+<body>
+
+  <!-- Barra superior: montada por js/comum.js -->
+  <header class="topo" data-perfil="ofertante" data-pagina="candidatos"></header>
+
+  <section class="cab-candidatos">
+    <div>
+      <h1>Candidatos</h1>
+      <p>Confira documentos e compatibilidade, pré-selecione para entrevista e registre o resultado.</p>
+    </div>
+    <button class="btn" id="simular-inscritos" title="Gera candidatos fictícios para testar a triagem"><i class="ti ti-users-plus"></i> Simular inscritos</button>
+    <label class="busca-cand">
+      <span class="sr-only">Buscar candidato</span>
+      <i class="ti ti-search"></i>
+      <input type="search" id="busca" placeholder="Buscar por nome ou curso">
+    </label>
+  </section>
+
+  <div class="vagas-sel" id="vagas-sel" role="tablist" aria-label="Vagas"></div>
+
+  <main class="quadro" id="quadro" aria-label="Candidatos por etapa"></main>
+
+  <!-- Ficha do candidato -->
+  <div class="fundo-ficha" id="fundo-ficha" hidden></div>
+  <aside class="ficha" id="ficha" aria-label="Ficha do candidato" aria-hidden="true"></aside>
+
+  <!-- Visualizar documento -->
+  <dialog class="modal modal-doc" id="modal-doc" aria-labelledby="md-titulo">
+    <div class="modal-corpo">
+      <h2 id="md-titulo">Documento</h2>
+      <div class="folha" id="md-folha"></div>
+    </div>
+    <div class="modal-rodape" id="md-rodape"></div>
+  </dialog>
+
+  <!-- Recusar documento / rejeitar candidato -->
+  <dialog class="modal" id="modal-motivo" aria-labelledby="mm-titulo">
+    <div class="modal-corpo">
+      <h2 id="mm-titulo"></h2>
+      <p id="mm-texto"></p>
+      <div class="campo">
+        <label for="mm-motivo" id="mm-rotulo"></label>
+        <textarea id="mm-motivo"></textarea>
+        <p class="erro" id="mm-erro"></p>
+      </div>
+    </div>
+    <div class="modal-rodape">
+      <button class="btn" data-fechar>Voltar</button>
+      <button class="btn btn-perigo" id="mm-confirmar"></button>
+    </div>
+  </dialog>
+
+  <script src="js/comum.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/agenda-dados.js"></script>
+  <script src="js/ofertante-dados.js"></script>
+  <script src="js/candidaturas-dados.js"></script>
+  <script src="js/candidatos-dados.js"></script>
+  <script src="js/candidatos.js"></script>
+</body>
+</html>
