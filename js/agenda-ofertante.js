@@ -198,21 +198,40 @@ function renderGrade() {
   HORAS.forEach((t) => {
     html += `<div class="gh-hora ${t.endsWith(":00") ? "cheia" : ""}">${t}</div>`;
     dias.forEach((d) => {
-      const e = estadoCelula(d, t);
-      let texto = "+ abrir", extra = "", rotulo = `${Radar.fmtDia(dataDe(d))} ${t}: fechado`;
-      if (e.tipo === "livre") { texto = "aberto"; extra = e.h.novo ? "novo" : ""; rotulo = `${Radar.fmtDia(dataDe(d))} ${t}: aberto`; }
-      if (e.tipo === "add") { texto = "+ abrir"; rotulo += " (será aberto)"; }
-      if (e.tipo === "rem") { texto = "fechar"; rotulo = `${Radar.fmtDia(dataDe(d))} ${t}: será fechado`; }
-      if (e.tipo === "reservado") {
-        const k = reservaDe(e.h);
-        texto = primeiroNome(k.nome);
-        extra = k.estudante ? "estudante" : "";
-        rotulo = `${Radar.fmtDia(dataDe(d))} ${t}: entrevista com ${k.nome}`;
-      }
-      html += `<button class="cel ${e.tipo} ${extra}" data-d="${d}" data-t="${t}" aria-label="${rotulo}" title="${rotulo}">${e.tipo === "reservado" ? '<i class="ti ti-user"></i>' : ""}${texto}</button>`;
+      const c = conteudoCelula(d, t);
+      html += `<button class="${c.classe}" data-d="${d}" data-t="${t}" aria-label="${c.rotulo}" title="${c.rotulo}">${c.html}</button>`;
     });
   });
   $("#grade").innerHTML = html;
+}
+
+// Aparência de uma célula da grade (classe, texto e rótulo acessível)
+function conteudoCelula(d, t) {
+  const e = estadoCelula(d, t);
+  let texto = "+ abrir", extra = "", rotulo = `${Radar.fmtDia(dataDe(d))} ${t}: fechado`;
+  if (e.tipo === "livre") { texto = "aberto"; extra = e.h.novo ? "novo" : ""; rotulo = `${Radar.fmtDia(dataDe(d))} ${t}: aberto`; }
+  if (e.tipo === "add") { texto = "+ abrir"; rotulo += " (será aberto)"; }
+  if (e.tipo === "rem") { texto = "fechar"; rotulo = `${Radar.fmtDia(dataDe(d))} ${t}: será fechado`; }
+  if (e.tipo === "reservado") {
+    const k = reservaDe(e.h);
+    texto = primeiroNome(k.nome);
+    extra = k.estudante ? "estudante" : "";
+    rotulo = `${Radar.fmtDia(dataDe(d))} ${t}: entrevista com ${k.nome}`;
+  }
+  return { classe: `cel ${e.tipo} ${extra}`.trim(), rotulo, html: `${e.tipo === "reservado" ? '<i class="ti ti-user"></i>' : ""}${texto}` };
+}
+
+// Atualiza as células já existentes, sem recriar a grade. Recriar no meio de um
+// clique tira da página o botão onde o mouse foi pressionado, e o navegador pode
+// perder o evento de soltar o botão (o arraste ficava "preso").
+function pintarCelulas() {
+  document.querySelectorAll("#grade .cel").forEach((el) => {
+    const c = conteudoCelula(Number(el.dataset.d), el.dataset.t);
+    if (el.className !== c.classe) el.className = c.classe;
+    if (el.innerHTML !== c.html) el.innerHTML = c.html;
+    el.setAttribute("aria-label", c.rotulo);
+    el.title = c.rotulo;
+  });
 }
 
 /* ---------- Barra de publicação ---------- */
@@ -322,7 +341,7 @@ function aplicar(d, t, modo) {
   else modo === "abrir" ? p.set(k, "add") : p.delete(k);        // horário novo
 }
 
-function atualizarEdicao() { renderGrade(); renderMetricas(); renderBarra(); }
+function atualizarEdicao() { pintarCelulas(); renderMetricas(); renderBarra(); }
 
 $("#grade").addEventListener("pointerdown", (ev) => {
   const cel = ev.target.closest(".cel");
@@ -332,17 +351,23 @@ $("#grade").addEventListener("pointerdown", (ev) => {
   modoArraste = modoPara(d, t);
   ultimaCel = null;
   aplicarIntervalo(d, t);
-  if (ev.pointerType === "mouse") { arrastando = true; ev.preventDefault(); }
+  if (ev.pointerType === "mouse") { arrastando = true; $("#grade").classList.add("arrastando", `modo-${modoArraste}`); ev.preventDefault(); }
   atualizarEdicao();
 });
 $("#grade").addEventListener("pointerover", (ev) => {
   if (!arrastando) return;
+  // Botão já solto (o "soltar" pode ter acontecido fora da grade ou da janela): encerra o arraste
+  if (!(ev.buttons & 1)) { encerrarArraste(); return; }
   const cel = ev.target.closest(".cel");
   if (!cel || cel.classList.contains("reservado")) return;
   aplicarIntervalo(Number(cel.dataset.d), cel.dataset.t);
   atualizarEdicao();
 });
-document.addEventListener("pointerup", () => { arrastando = false; });
+function encerrarArraste() { arrastando = false; ultimaCel = null; $("#grade").classList.remove("arrastando", "modo-abrir", "modo-fechar"); }
+["pointerup", "pointercancel"].forEach((tipo) => window.addEventListener(tipo, encerrarArraste));
+window.addEventListener("blur", encerrarArraste);
+// Impede o navegador de iniciar um "arrastar botão" nativo, que engole o pointerup
+$("#grade").addEventListener("dragstart", (ev) => ev.preventDefault());
 // Teclado: Enter/Espaço sobre uma célula
 $("#grade").addEventListener("click", (ev) => {
   if (ev.detail !== 0) return;
