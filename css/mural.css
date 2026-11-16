@@ -259,3 +259,8 @@ dialog.detalhes::backdrop { background: rgba(15, 22, 40, .45); }
 @media (max-width: 400px) {
   .cartao-info { grid-template-columns: 1fr; }
 }
+
+/* "Falar com ofertante" desabilitado, com o motivo ao lado */
+.conversa-bloqueada { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
+.conversa-bloqueada small { font-size: 11px; color: var(--texto-3); }
+.btn:disabled { cursor: not-allowed; }

@@ -54,3 +54,6 @@
   .aula-linha { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 38px; padding-bottom: 8px; border-bottom: 1px solid var(--borda); }
   .aula-linha input[type="text"] { grid-column: 1 / 4; grid-row: 2; }
 }
+
+/* Títulos das seções sem texto explicativo abaixo */
+.secao-perfil h2 { margin-bottom: 14px; }

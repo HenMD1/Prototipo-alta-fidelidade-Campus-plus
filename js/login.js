@@ -31,6 +31,7 @@ const contasZero = () => lerZero("contas", {});
 let erros = {};
 let valores = {};
 let enviando = false;
+let primeiroAcesso = false;
 
 /* ---------- Números do mural (vêm dos dados reais do protótipo) ---------- */
 function renderNumeros() {
@@ -119,7 +120,8 @@ const TELAS = {
         <button type="button" role="tab" data-aba="ofertante" aria-selected="${!est}"><i class="ti ti-building"></i> Ofertante</button>
       </div>
       <div class="info-acesso" style="margin-bottom:14px"><i class="ti ti-flask"></i><span>A conta fica só neste navegador, num ambiente separado da demonstração. Crie um estudante <b>e</b> um ofertante para testar o caminho completo entre os dois.</span></div>
-      ${existente ? `<div class="info-acesso" style="margin-bottom:14px;background:var(--alerta-bg);border-color:#f1d7a6;color:var(--alerta-tx)"><i class="ti ti-user-exclamation"></i><span>Você já criou <b>${esc(est ? existente.nome : existente.empresa)}</b>. <button type="button" class="link-inline" data-entrar-teste="${aba}">Entrar com essa conta</button> ou preencha abaixo para substituir os dados.</span></div>` : ""}
+      ${primeiroAcesso && est ? `<div class="info-acesso" style="margin-bottom:14px"><i class="ti ti-user-plus"></i><span>Primeiro acesso com o cartão <b>${esc(valores.cartao)}</b>. Complete seus dados para criar o seu perfil.</span></div>` : ""}
+      ${existente ? `<div class="info-acesso" style="margin-bottom:14px;background:var(--alerta-bg);border-color:#f1d7a6;color:var(--alerta-tx)"><i class="ti ti-user-exclamation"></i><span>Você já criou <b>${esc(est ? existente.nome : existente.empresa)}</b>. <button type="button" class="link-inline" data-entrar-teste="${aba}">Entrar com essa conta</button>, ou crie outra: ela substitui a anterior e recomeça os dados do teste.</span></div>` : ""}
       <form class="form-acesso" id="form" novalidate>
         ${est ? `
           ${campo({ id: "nome", rotulo: "Nome completo", icone: "ti-user", placeholder: "Nome e sobrenome", attrs: 'autocomplete="name"' })}
@@ -278,11 +280,19 @@ function entrar(perfil, ambiente = "demo") {
 }
 
 // Login: se o cartão/e-mail for de uma conta de teste, entra no ambiente do zero
+const CARTAO_DEMO = "00312345";
+const EMAIL_DEMO = "mariana.souza@techsul.com.br";
+
+// Para onde o login leva: conta de teste, demonstração ou primeiro acesso
 function ambienteDoLogin() {
   const c = contasZero();
-  if (aba === "estudante" && c.estudante && c.estudante.cartao === valores.cartao) return "zero";
-  if (aba === "ofertante" && c.ofertante && c.ofertante.email.toLowerCase() === (valores.email || "").toLowerCase()) return "zero";
-  return "demo";
+  if (aba === "estudante") {
+    if (c.estudante && c.estudante.cartao === valores.cartao) return "zero";
+    return valores.cartao === CARTAO_DEMO ? "demo" : "novo";
+  }
+  const email = (valores.email || "").toLowerCase();
+  if (c.ofertante && c.ofertante.email.toLowerCase() === email) return "zero";
+  return email === EMAIL_DEMO ? "demo" : "novo";
 }
 
 function criarConta() {
@@ -295,6 +305,9 @@ function criarConta() {
     const sigla = nome.split(" ").filter((p) => p.length > 2 && !/^(ltda|s\.?a\.?|me|eireli)$/i.test(p)).slice(0, 3).map((p) => p[0]).join("").toUpperCase() || nome.slice(0, 2).toUpperCase();
     conta = { empresa: nome, tipo: valores.tipo || "Empresa", responsavel: valores.responsavel.trim().replace(/\s+/g, " "), email: valores.email.trim(),
       sigla, cor: (contas.ofertante && contas.ofertante.cor) || CORES_EMPRESA[Math.floor(Math.random() * CORES_EMPRESA.length)], criadaEm: new Date().toISOString() };
+  }
+  if (contas[aba]) {
+    Object.keys(localStorage).filter((k) => k.startsWith("radar:zero:") && k !== "radar:zero:contas").forEach((k) => localStorage.removeItem(k));
   }
   contas[aba] = conta;
   salvarZero("contas", contas);
@@ -317,7 +330,21 @@ function enviar() {
   // Simula a ida ao servidor
   setTimeout(() => {
     enviando = false;
-    if (tela === "login") return entrar(aba, ambienteDoLogin());
+    if (tela === "login") {
+      const destino = ambienteDoLogin();
+      if (destino !== "novo") return entrar(aba, destino);
+      if (aba === "estudante") {
+        // Primeiro acesso com este cartão: cria a conta (de teste) já com o cartão preenchido
+        tela = "criar"; primeiroAcesso = true;
+        valores = { cartao: valores.cartao, lembrar: valores.lembrar };
+        history.replaceState(null, "", "?criar=estudante");
+        render();
+      } else {
+        erros = { geral: 'E-mail sem cadastro. Use a conta de demonstração ou <button type="button" class="link-inline" data-tela="criar">crie uma conta de teste</button>.' };
+        render();
+      }
+      return;
+    }
     if (tela === "criar") return criarConta();
     if (tela === "recuperar") { tela = "recuperado"; render(); return; }
     if (tela === "solicitar") { tela = "solicitado"; render(); }
@@ -347,12 +374,12 @@ cartao.addEventListener("submit", (e) => { e.preventDefault(); if (!enviando) en
 cartao.addEventListener("click", (e) => {
   const abaBtn = e.target.closest("[data-aba]");
   if (abaBtn) {
-    aba = abaBtn.dataset.aba; erros = {}; valores = { lembrar: valores.lembrar };
+    aba = abaBtn.dataset.aba; erros = {}; valores = { lembrar: valores.lembrar }; primeiroAcesso = false;
     history.replaceState(null, "", tela === "criar" ? `?criar=${aba}` : aba === "ofertante" ? "?perfil=ofertante" : location.pathname);
     render(); return;
   }
   const t = e.target.closest("[data-tela]");
-  if (t) { tela = t.dataset.tela; erros = {}; if (tela === "login") valores = { lembrar: valores.lembrar }; render(); return; }
+  if (t) { tela = t.dataset.tela; erros = {}; primeiroAcesso = false; if (tela === "login") valores = { lembrar: valores.lembrar }; render(); return; }
   const ver = e.target.closest("[data-ver]");
   if (ver) {
     const input = document.getElementById(ver.dataset.ver);

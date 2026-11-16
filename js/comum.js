@@ -83,19 +83,30 @@ const Radar = (() => {
   }
 
   /* ---------- Toast ---------- */
+  // Janelas abertas com showModal() ficam numa camada acima de toda a página.
+  // Por isso, com uma janela aberta, o aviso é colocado dentro dela.
   let toastEl, toastTimer;
   function toast(msg, icone = "ti-info-circle") {
     if (!toastEl) {
       toastEl = document.createElement("div");
       toastEl.className = "toast";
       toastEl.setAttribute("role", "status");
-      document.body.appendChild(toastEl);
     }
+    const janela = [...document.querySelectorAll("dialog[open]")].pop();
+    const destino = janela || document.body;
+    if (toastEl.parentElement !== destino) destino.appendChild(toastEl);
     toastEl.innerHTML = `<i class="ti ${icone}"></i><span>${msg}</span>`;
+    toastEl.classList.remove("visivel");
+    void toastEl.offsetWidth;            // reinicia a animação de entrada
     toastEl.classList.add("visivel");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toastEl.classList.remove("visivel"), 3400);
   }
+
+  // Ao fechar uma janela, o aviso que estava nela volta para a página
+  document.addEventListener("close", (e) => {
+    if (toastEl && e.target.tagName === "DIALOG" && toastEl.parentElement === e.target) document.body.appendChild(toastEl);
+  }, true);
 
   /* ---------- Perfis ---------- */
   const PERFIS = {

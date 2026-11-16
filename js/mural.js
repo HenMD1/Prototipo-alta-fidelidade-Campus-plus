@@ -296,7 +296,7 @@ function abrirDetalhes(id) {
     <div class="det-rodape">
       <span class="prazo"><i class="ti ti-hourglass"></i>Inscrições até ${dataPrazo(v.prazoDias)}</span>
       <div style="display:flex;gap:8px">
-        <button class="btn" data-acao="mensagem"><i class="ti ti-message-circle"></i> Falar com ofertante</button>
+        ${botaoConversa(v.id, inscrito)}
         ${!aberta ? "" : inscrito
           ? '<button class="btn" disabled><i class="ti ti-check"></i> Candidatura enviada</button>'
           : '<button class="btn btn-primario" data-acao="candidatar"><i class="ti ti-send"></i> Candidatar-se</button>'}
@@ -350,14 +350,32 @@ el.detalhes.addEventListener("click", (e) => {
     toast('Candidatura iniciada. Envie os documentos em <a href="candidaturas.html?c=m-' + id + '" style="color:#fff;text-decoration:underline">Minhas candidaturas</a>.', "ti-circle-check");
   }
   if (botao.dataset.acao === "mensagem") {
-    // Conversa existente com o ofertante desta vaga (só depois da candidatura)
-    const agendaEst = Radar.ler("radar:agenda", null);
-    const ag = agendaEst ? agendaEst.find((x) => x.oportunidade === id) : (VINCULADAS_AGENDA[id] ? { id: VINCULADAS_AGENDA[id] } : null);
-    const conversa = ag ? `ag-${ag.id}` : Radar.ambiente === "demo" ? { 14: "ex-agro", 8: "ex-ic" }[id] : null;
+    const conversa = conversaDaVaga(id);
     if (conversa) location.href = `mensagens.html?conversa=${conversa}`;
-    else toast("A conversa com o ofertante fica disponível depois que você se candidata.", "ti-message-circle");
   }
 });
+
+/* ---------- Conversa com o ofertante da vaga ----------
+   Existe quando o estudante já foi pré-selecionado (agenda de entrevistas)
+   ou, na demonstração, nas conversas de exemplo. Antes disso o botão fica
+   desabilitado, com o motivo escrito ao lado. */
+function conversaDaVaga(id) {
+  const agendaEst = Radar.ler("radar:agenda", null);
+  const ag = agendaEst ? agendaEst.find((x) => x.oportunidade === id) : (VINCULADAS_AGENDA[id] ? { id: VINCULADAS_AGENDA[id] } : null);
+  if (ag) return `ag-${ag.id}`;
+  return Radar.ambiente === "demo" ? { 14: "ex-agro", 8: "ex-ic" }[id] || null : null;
+}
+
+function botaoConversa(id, inscrito) {
+  if (inscrito && conversaDaVaga(id)) {
+    return '<button class="btn" data-acao="mensagem"><i class="ti ti-message-circle"></i> Falar com ofertante</button>';
+  }
+  const motivo = inscrito ? "Disponível após a pré-seleção" : "Disponível após se candidatar";
+  return `<span class="conversa-bloqueada">
+      <button class="btn" disabled aria-describedby="motivo-conversa"><i class="ti ti-message-circle"></i> Falar com ofertante</button>
+      <small id="motivo-conversa">${motivo}</small>
+    </span>`;
+}
 
 /* ---------- Filtros a partir do perfil do estudante ---------- */
 let perfilAplicado = false;
