@@ -14,7 +14,11 @@ const CURSOS = ["Ciência da Computação", "Engenharia de Computação", "Siste
 
 const PADRAO = {
   matricula: Radar.estudante().matricula, nome: Radar.estudante().nome, curso: Radar.estudante().curso || "Ciência da Computação", semestre: Radar.estudante().semestre || 5,
-  areas: ["Computação"], tipos: ["estagio", "bolsa"], horas: 20, dias: ["seg", "ter", "qua", "qui", "sex"],
+  // Escolhas de exemplo só na demonstração; uma conta nova começa sem nada marcado
+  ...(Radar.ambiente === "demo"
+    ? { areas: ["Computação"], tipos: ["estagio", "bolsa"], dias: ["seg", "ter", "qua", "qui", "sex"] }
+    : { areas: [], tipos: [], dias: [] }),
+  horas: 20,
   modalidade: "qualquer", regioes: [], remMin: "", pcd: false, acessibilidade: "", curriculo: null, avisos: true,
   aulas: null, // preenchida com a grade do portal (abaixo)
 };
@@ -31,7 +35,8 @@ const GRADE_PORTAL = [
 PADRAO.aulas = Radar.ambiente === "demo" ? GRADE_PORTAL.map((a) => ({ ...a })) : [];
 
 const salvo = Radar.ler("radar:perfil-estudante", null);
-let p = { ...PADRAO, ...(salvo || {}) };
+// Nome e cartão vêm sempre da conta logada (nunca de um perfil salvo antes)
+let p = { ...PADRAO, ...(salvo || {}), nome: PADRAO.nome, matricula: PADRAO.matricula };
 let original = JSON.stringify(p);
 let erros = {};
 
@@ -60,7 +65,7 @@ function renderCabecalho() {
   $("#cabecalho").innerHTML = `
     <div>
       <h1>${BEM_VINDO ? "Complete seu perfil" : "Meu perfil"}</h1>
-      <p>${BEM_VINDO ? "Leva um minuto e ajuda o Radar a mostrar só as vagas que cabem na sua rotina." : "Essas informações aparecem para os ofertantes quando você se candidata e definem os filtros sugeridos no mural."}</p>
+      ${BEM_VINDO ? "<p>Leva um minuto e ajuda o Radar a mostrar as vagas que cabem na sua rotina.</p>" : ""}
     </div>`;
 }
 
@@ -68,11 +73,10 @@ function render() {
   const n = compativeis().length;
   const horasDia = p.dias.length ? p.horas / p.dias.length : 0;
   $("#form").innerHTML = `
-    ${BEM_VINDO ? `<div class="boas-vindas"><i class="ti ti-confetti"></i><div><strong>Boas-vindas ao Radar, ${esc(p.nome.split(" ")[0])}!</strong><p>Seu nome e matrícula vêm do cadastro da universidade. Conte o que você procura.</p></div></div>` : ""}
+    ${BEM_VINDO ? `<div class="boas-vindas"><i class="ti ti-confetti"></i><div><strong>Boas-vindas ao Radar, ${esc(p.nome.split(" ")[0])}!</strong></div></div>` : ""}
 
     <section class="secao-perfil">
       <h2><i class="ti ti-school"></i> Dados acadêmicos</h2>
-      <p>Usados para conferir requisitos das vagas, como curso e semestre mínimo.</p>
       <div class="grade-campos">
         <div class="campo-form"><span class="rotulo">Nome</span><div class="campo-fixo"><i class="ti ti-lock"></i>${esc(p.nome)}</div></div>
         <div class="campo-form"><span class="rotulo">Cartão UFRGS</span><div class="campo-fixo"><i class="ti ti-lock"></i>${esc(p.matricula)}</div></div>
@@ -91,7 +95,6 @@ function render() {
 
     <section class="secao-perfil">
       <h2><i class="ti ti-target-arrow"></i> O que você procura</h2>
-      <p>Marque quantas áreas e tipos quiser.</p>
       <div class="grade-campos">
         <div class="${cls("areas")} cheio">
           <span class="rotulo">Áreas de interesse</span>
@@ -108,7 +111,6 @@ function render() {
 
     <section class="secao-perfil">
       <h2><i class="ti ti-calendar-time"></i> Disponibilidade</h2>
-      <p>Pense na sua grade de aulas deste semestre.</p>
       <div class="grade-campos">
         <div class="campo-form cheio">
           <label for="horas">Horas por semana disponíveis</label>
@@ -132,7 +134,7 @@ function render() {
         </div>
         ${p.modalidade !== "remota" ? `
         <div class="campo-form cheio">
-          <span class="rotulo">Regiões de fácil acesso <span class="opcional">(nenhuma = qualquer região)</span></span>
+          <span class="rotulo">Regiões de fácil acesso <span class="opcional">(opcional)</span></span>
           <div class="chips" role="group" aria-label="Regiões">${REGIOES.map((r) => chip("regioes", r, r, p.regioes.includes(r))).join("")}</div>
         </div>` : ""}
       </div>
@@ -140,7 +142,6 @@ function render() {
 
     <section class="secao-perfil" id="grade">
       <h2><i class="ti ti-calendar-week"></i> Grade de aulas</h2>
-      <p>Importada do portal do aluno. Ajuste se algo mudou: a agenda de entrevistas avisa quando um horário conflita com uma aula.</p>
       <div class="aulas ${erros.aulas ? "invalido" : ""}">
         ${p.aulas.length ? `<div class="aula-cab"><span>Dia</span><span>Início</span><span>Fim</span><span>Disciplina</span><span></span></div>` : ""}
         ${p.aulas.map((a, i) => `
@@ -150,18 +151,17 @@ function render() {
           <input type="time" data-aula="${i}" data-campo="fim" value="${a.fim}" step="600" aria-label="Fim da aula ${i + 1}">
           <input type="text" data-aula="${i}" data-campo="disciplina" value="${esc(a.disciplina)}" placeholder="Disciplina" aria-label="Disciplina da aula ${i + 1}">
           <button type="button" class="btn btn-texto btn-icone" data-rem-aula="${i}" aria-label="Remover aula ${i + 1}"><i class="ti ti-trash"></i></button>
-        </div>`).join("") || '<p class="ajuda">Nenhuma aula cadastrada. Sem grade, a agenda não consegue avisar conflitos.</p>'}
+        </div>`).join("") || '<p class="ajuda">Nenhuma aula cadastrada.</p>'}
         ${erro("aulas")}
       </div>
       <div class="aulas-acoes">
         <button type="button" class="btn" data-add-aula><i class="ti ti-plus"></i> Adicionar aula</button>
-        <button type="button" class="btn btn-texto" data-importar-grade><i class="ti ti-download"></i> Importar de novo do portal</button>
+        <button type="button" class="btn btn-texto" data-importar-grade><i class="ti ti-download"></i> Importar</button>
       </div>
     </section>
 
     <section class="secao-perfil">
       <h2><i class="ti ti-id"></i> Currículo e acessibilidade</h2>
-      <p>Opcional. O currículo é anexado automaticamente quando uma vaga pedir.</p>
       <div class="grade-campos">
         <div class="campo-form cheio">
           <div class="anexo-cv">
@@ -171,15 +171,15 @@ function render() {
           </div>
         </div>
         <div class="campo-form cheio">
-          <label class="check-linha"><input type="checkbox" name="pcd" ${p.pcd ? "checked" : ""}> Sou pessoa com deficiência e quero informar recursos de acessibilidade</label>
+          <label class="check-linha"><input type="checkbox" name="pcd" ${p.pcd ? "checked" : ""}> Sou pessoa com deficiência</label>
         </div>
         ${p.pcd ? `
         <div class="campo-form cheio">
-          <label for="acessibilidade">Recursos de que você precisa <span class="opcional">(visível só para ofertantes de vagas em que você se candidatar)</span></label>
+          <label for="acessibilidade">Recursos de acessibilidade</label>
           <textarea id="acessibilidade" name="acessibilidade" placeholder="Intérprete de Libras na entrevista, leitor de tela, mesa adaptada…">${esc(p.acessibilidade)}</textarea>
         </div>` : ""}
         <div class="campo-form cheio">
-          <label class="check-linha"><input type="checkbox" name="avisos" ${p.avisos ? "checked" : ""}> Avisar quando surgirem vagas compatíveis com este perfil</label>
+          <label class="check-linha"><input type="checkbox" name="avisos" ${p.avisos ? "checked" : ""}> Avisar sobre vagas compatíveis</label>
         </div>
       </div>
     </section>

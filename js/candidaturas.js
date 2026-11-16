@@ -107,6 +107,9 @@ function criarAgendaSimulada(c) {
 }
 const ENCERRADAS = ["nao-selecionado", "cancelada", "desistiu", "retirada"];
 const encerrada = (c) => ENCERRADAS.includes(c.situacao);
+// Concluída: aprovada e com o termo de compromisso assinado pelas três partes
+const concluida = (c) => !encerrada(c) && c.etapa === 5;
+const abaDe = (c) => (encerrada(c) ? "encerradas" : concluida(c) ? "concluidas" : "andamento");
 
 /* ---------- Próxima ação (o que o estudante precisa saber/fazer) ---------- */
 function proxima(c) {
@@ -147,7 +150,7 @@ function proxima(c) {
 /* ---------- Métricas e lista ---------- */
 function renderMetricas() {
   const ts = todas();
-  const ativas = ts.filter((c) => !encerrada(c));
+  const ativas = ts.filter((c) => abaDe(c) === "andamento");
   const pendentes = ativas.filter((c) => proxima(c).tipo === "alerta").length;
   const entrevistas = ts.filter((c) => c.statusAgenda === "marcada" && !encerrada(c)).length;
   const aprovadas = ts.filter((c) => c.situacao === "aprovada").length;
@@ -165,12 +168,14 @@ function ordenar(lista) {
 
 function renderLista() {
   const ts = todas();
-  const andamento = ordenar(ts.filter((c) => !encerrada(c)));
-  const encerradas = ts.filter(encerrada);
-  $("#qtd-andamento").textContent = `(${andamento.length})`;
-  $("#qtd-encerradas").textContent = `(${encerradas.length})`;
+  const grupos = {
+    andamento: ordenar(ts.filter((c) => abaDe(c) === "andamento")),
+    concluidas: ts.filter((c) => abaDe(c) === "concluidas"),
+    encerradas: ts.filter((c) => abaDe(c) === "encerradas"),
+  };
+  Object.entries(grupos).forEach(([k, l]) => ($(`#qtd-${k}`).textContent = `(${l.length})`));
   document.querySelectorAll(".abas button").forEach((b) => b.setAttribute("aria-selected", b.dataset.aba === aba));
-  const lista = aba === "andamento" ? andamento : encerradas;
+  const lista = grupos[aba];
 
   if (!atualId || !ts.some((c) => c.id === atualId)) atualId = (lista[0] || ts[0])?.id;
 
@@ -187,7 +192,7 @@ function renderLista() {
         <span class="acao-linha ${p.tipo}"><i class="ti ${p.icone}"></i>${p.titulo}</span>
       </span>
     </button>`;
-  }).join("") : `<p class="lista-vazia">${aba === "andamento" ? "Nenhuma candidatura em andamento." : "Nenhuma candidatura encerrada."}</p>`;
+  }).join("") : `<p class="lista-vazia">${{ andamento: "Nenhuma candidatura em andamento.", concluidas: "Nenhuma candidatura concluída ainda.", encerradas: "Nenhuma candidatura encerrada." }[aba]}</p>`;
 }
 
 /* ---------- Detalhe ---------- */
@@ -411,6 +416,7 @@ function assinarTermo() {
     cc.etapa = 5;
     registrar(cc, "ti-building-bank", "Termo validado e assinado pela universidade");
     registrar(cc, "ti-confetti", "Termo de compromisso emitido");
+    if (atualId === cc.id) aba = "concluidas";
     salvar();
     Radar.notificar(`Termo de compromisso de <b>${vaga(cc.vaga).titulo}</b> emitido. Seu estágio está confirmado!`, "ti-file-certificate", `candidaturas.html?c=${cc.id}`);
     render();
@@ -543,7 +549,8 @@ $("#demo-painel").addEventListener("click", (e) => {
   const erro = EVENTOS[b.dataset.evento](propria());
   if (erro) return Radar.toast(erro, "ti-info-circle");
   salvar();
-  if (atualId && encerrada(todas().find((x) => x.id === atualId) || {})) aba = "encerradas";
+  const cAtual = atualId && todas().find((x) => x.id === atualId);
+  if (cAtual) aba = abaDe(cAtual);
   render();
   $("#demo-painel").hidden = true;
 });
@@ -553,7 +560,7 @@ document.addEventListener("click", (e) => { if (!e.target.closest(".demo")) $("#
 window.addEventListener("radar:navegar", () => {
   atualId = new URLSearchParams(location.search).get("c");
   const c = todas().find((x) => x.id === atualId);
-  if (c) aba = encerrada(c) ? "encerradas" : "andamento";
+  if (c) aba = abaDe(c);
   render();
 });
 window.addEventListener("radar:sincronizar", (e) => {
@@ -563,6 +570,6 @@ window.addEventListener("radar:sincronizar", (e) => {
 carregar();
 {
   const c = atualId && todas().find((x) => x.id === atualId);
-  if (c && encerrada(c)) aba = "encerradas";
+  if (c) aba = abaDe(c);
 }
 render();
