@@ -166,7 +166,7 @@ function render() {
         <div class="campo-form cheio">
           <div class="anexo-cv">
             <i class="ti ti-file-cv ic"></i>
-            <div class="nome">${p.curriculo ? `<b>${esc(p.curriculo.nome)}</b><small>${esc(p.curriculo.tamanho)}</small>` : "Nenhum currículo enviado<small>PDF de até 5 MB</small>"}</div>
+            <div class="nome">${p.curriculo ? `<b>${esc(p.curriculo.nome)}</b><small>${esc(p.curriculo.tamanho)}</small>` : "Nenhum currículo enviado<small>PDF de até 10 MB</small>"}</div>
             <label><input type="file" id="curriculo" accept=".pdf" aria-label="Enviar currículo em PDF"><span class="btn"><i class="ti ti-upload"></i> ${p.curriculo ? "Trocar" : "Enviar"}</span></label>
           </div>
         </div>
@@ -262,7 +262,7 @@ $("#form").addEventListener("change", (e) => {
   if (e.target.id !== "curriculo" || !e.target.files[0]) return;
   const f = e.target.files[0];
   if (f.type !== "application/pdf") return Radar.toast("Envie o currículo em PDF.", "ti-alert-circle");
-  if (f.size > 5 * 1024 * 1024) return Radar.toast("O arquivo passa de 5 MB.", "ti-alert-circle");
+  if (f.size > 10 * 1024 * 1024) return Radar.toast("O arquivo passa de 10 MB.", "ti-alert-circle");
   p.curriculo = { nome: f.name, tamanho: f.size > 1048576 ? `${(f.size / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(f.size / 1024))} KB` };
   render();
   Radar.toast("Currículo anexado.", "ti-file-check");

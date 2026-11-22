@@ -230,7 +230,7 @@ function renderJanela() {
     <form class="compor" id="compor">
       <div class="rapidas">${respostasRapidas(c).map((r) => `<button type="button" data-rapida>${esc(r)}</button>`).join("")}</div>
       <div class="compor-linha">
-        <label class="anexar" title="Anexar arquivo (PDF, JPG ou PNG até 5 MB)">
+        <label class="anexar" title="Anexar arquivo (PDF, JPG ou PNG até 10 MB)">
           <input type="file" id="anexo" accept=".pdf,.jpg,.jpeg,.png" aria-label="Anexar arquivo">
           <span class="btn btn-icone"><i class="ti ti-paperclip" style="font-size:18px"></i></span>
         </label>
@@ -419,7 +419,7 @@ $("#janela").addEventListener("change", (e) => {
   if (e.target.id !== "anexo" || !e.target.files[0]) return;
   const f = e.target.files[0];
   if (!TIPOS_ANEXO.includes(f.type)) return Radar.toast("Formato não aceito. Envie um PDF, JPG ou PNG.", "ti-alert-circle");
-  if (f.size > 5 * 1024 * 1024) return Radar.toast("O arquivo passa de 5 MB.", "ti-alert-circle");
+  if (f.size > 10 * 1024 * 1024) return Radar.toast("O arquivo passa de 10 MB.", "ti-alert-circle");
   const tamanho = f.size > 1048576 ? `${(f.size / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(f.size / 1024))} KB`;
   enviar({ texto: $("#texto").value.trim(), anexo: { nome: f.name, tamanho } });
 });
