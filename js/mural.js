@@ -7,6 +7,8 @@ const $ = (sel) => document.querySelector(sel);
 const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 const CARGA_MAX = 40;
 
+const TURNOS = ["Manhã", "Tarde", "Noite", "Flexível"];
+
 const form = $("#form-filtros");
 const el = {
   busca: $("#busca"),
@@ -54,6 +56,7 @@ function chip(name, value, texto) {
 $("#opcoes-area").innerHTML = AREAS.map((a) => chip("area", a, a)).join("");
 $("#opcoes-tipo").innerHTML = Object.entries(TIPOS).map(([id, t]) => chip("tipo", id, t.nome)).join("");
 $("#opcoes-dias").innerHTML = DIAS.map((d) => chip("dia", d.id, d.nome)).join("");
+$("#opcoes-turno").innerHTML = TURNOS.map((t) => chip("turno", t, t)).join("");
 $("#opcoes-regiao").innerHTML = REGIOES.map(
   (r) => `<label><input type="checkbox" name="regiao" value="${r}"> ${r}</label>`
 ).join("");
@@ -71,6 +74,7 @@ function lerFiltros() {
     tipos: marcados("tipo"),
     cargaMax: Number(el.carga.value),
     dias: marcados("dia"),
+    turnos: marcados("turno"),
     modalidade,
     // Critério: com modalidade remota, o filtro de região é desconsiderado.
     regioes: modalidade === "remota" ? [] : marcados("regiao"),
@@ -98,6 +102,10 @@ function atende(v, f) {
 
   // Todos os dias de trabalho estão entre os dias selecionados.
   if (f.dias.length && !v.dias.every((d) => f.dias.includes(d))) return false;
+
+  // Turno corresponde ao selecionado.
+  // Turnos como flexível vão aparecer em qualquer filtragem de turno
+  if (f.turnos.length && !f.turnos.includes(v.turno) && v.turno !== "Flexível") return false;
 
   // Modalidade igual à selecionada ("qualquer" aceita ambas).
   if (f.modalidade !== "qualquer" && v.modalidade !== f.modalidade) return false;
@@ -133,6 +141,7 @@ function filtrosAtivos(f) {
     const nomes = DIAS.filter((d) => f.dias.includes(d.id)).map((d) => d.nome).join(", ");
     lista.push({ texto: `Dias: ${nomes}`, remover: () => form.querySelectorAll('input[name="dia"]').forEach((i) => (i.checked = false)) });
   }
+  f.turnos.forEach((t) => lista.push({ texto: `Turno: ${t}`, remover: desmarcar("turno", t) }));
   if (f.modalidade !== "qualquer") {
     lista.push({
       texto: f.modalidade === "remota" ? "Remota" : "Presencial",
@@ -201,13 +210,14 @@ function cartao(v) {
       </button>
     </div>
     <div class="cartao-etiquetas">
+      ${v.permiteNegociacaoHorario ? '<span class="etiqueta" style="background:#eef3fe;color:var(--cor-primaria)"><i class="ti ti-clock-edit"></i>Horário negociável</span>' : ""}
       <span class="etiqueta ${v.tipo}"><i class="ti ${tipo.icone}"></i>${tipo.nome}</span>
       <span class="etiqueta" style="background:var(--superficie-2);color:var(--texto-2)">${v.area}</span>
       ${inscrito ? '<span class="etiqueta sucesso"><i class="ti ti-check"></i>Inscrito</span>' : ""}
     </div>
     <div class="cartao-info">
       <div><i class="ti ti-cash"></i><span class="valor">${brl.format(v.remuneracao)}</span>/mês</div>
-      <div><i class="ti ti-clock"></i><span class="valor">${v.cargaHoraria}h</span>/semana</div>
+<div><i class="ti ti-clock"></i><span><span class="valor">${v.cargaHoraria}h</span>/semana${v.turno ? ` · ${v.turno}` : ""}</span></div>
       <div><i class="ti ${v.modalidade === "remota" ? "ti-world" : "ti-map-pin"}"></i>${textoLocal(v)}</div>
       <div><i class="ti ti-calendar-week"></i>${miniDias(v.dias)}</div>
     </div>
@@ -285,6 +295,10 @@ function abrirDetalhes(id) {
         <div><small>Modalidade</small><strong>${textoLocal(v)}</strong></div>
         <div><small>Local</small><strong>${v.local}</strong></div>
         <div><small>Vagas</small><strong>${v.vagas}</strong></div>
+        ${v.tipo === "estagio" ? `
+          <div><small>Negociação de horário</small><strong>${v.permiteNegociacaoHorario ? "Aceita negociar" : "Horário fixo"}</strong></div>
+          ${v.cargaSemanaProvas != null ? `<div><small>Semana de provas</small><strong>Até ${v.cargaSemanaProvas}h/semana</strong></div>` : ""}
+        ` : ""}
       </div>
       <section class="det-secao"><h3>Sobre a oportunidade</h3><p>${v.descricao}</p></section>
       <section class="det-secao"><h3>Requisitos</h3><ul>${v.requisitos.map((r) => `<li>${r}</li>`).join("")}</ul></section>
