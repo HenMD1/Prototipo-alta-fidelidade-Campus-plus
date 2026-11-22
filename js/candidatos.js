@@ -247,7 +247,7 @@ function renderFicha() {
             <div class="nome">${esc(d.nome)}<small>${d.arquivo ? esc(d.arquivo) : "Ainda não enviado"}</small>${d.obs ? `<small class="obs">${esc(d.obs)}</small>` : ""}</div>
             <span class="etiqueta ${ROT[d.status][0]}">${ROT[d.status][1]}</span>
             <div class="acoes">
-              ${d.arquivo && d.status !== "pendente" ? `<button class="btn btn-texto" data-ver-doc="${i}" title="Visualizar"><i class="ti ti-eye"></i></button>` : ""}
+              ${d.arquivo && d.status !== "pendente" ? `<button class="btn btn-texto" data-ver-doc="${i}" title="Visualizar" aria-label="Visualizar ${esc(d.nome)}"><i class="ti ti-eye"></i></button><button class="btn btn-texto" data-baixar-doc="${i}" title="Baixar" aria-label="Baixar ${esc(d.nome)}"><i class="ti ti-download"></i></button>` : ""}
               ${podeConferir && d.status === "enviado" ? `<button class="btn btn-texto" data-aprovar-doc="${i}" title="Aprovar documento" style="color:var(--sucesso-tx)"><i class="ti ti-check"></i></button><button class="btn btn-texto" data-recusar-doc="${i}" title="Recusar documento" style="color:var(--perigo)"><i class="ti ti-x"></i></button>` : ""}
             </div>
           </div>`).join("")}
@@ -305,9 +305,15 @@ function verDocumento(i) {
   $("#md-folha").innerHTML = `<div class="marca-doc">Documento simulado pelo protótipo</div>${corpo}`;
   const conferir = k.fase === "analise" && d.status === "enviado" && k.origem !== "est-agenda";
   $("#md-rodape").innerHTML = conferir
-    ? `<button class="btn" data-fechar>Fechar</button><button class="btn btn-perigo" data-recusar-doc="${i}">Recusar</button><button class="btn btn-primario" data-aprovar-doc="${i}"><i class="ti ti-check"></i> Aprovar documento</button>`
-    : `<button class="btn btn-primario" data-fechar>Fechar</button>`;
+    ? `<button class="btn" data-baixar-doc="${i}" style="margin-right:auto"><i class="ti ti-download"></i> Baixar</button><button class="btn" data-fechar>Fechar</button><button class="btn btn-perigo" data-recusar-doc="${i}">Recusar</button><button class="btn btn-primario" data-aprovar-doc="${i}"><i class="ti ti-check"></i> Aprovar documento</button>`
+    : `<button class="btn" data-baixar-doc="${i}" style="margin-right:auto"><i class="ti ti-download"></i> Baixar</button><button class="btn btn-primario" data-fechar>Fechar</button>`;
   $("#modal-doc").showModal();
+}
+
+function baixarDocumento(i) {
+  const k = atual(), d = k.docs[i];
+  if (!d || !d.arquivo) return;
+  Radar.toast(`Download de “${esc(d.arquivo)}” simulado no protótipo.`, "ti-download");
 }
 
 /* ---------- Ações sobre o candidato ---------- */
@@ -471,6 +477,9 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && abertoCh
 document.addEventListener("click", (e) => {
   if (!abertoChave) return;
   const ver = e.target.closest("[data-ver-doc]");
+  if (ver) return verDocumento(Number(ver.dataset.verDoc));
+  const baixar = e.target.closest("[data-baixar-doc]");
+  if (baixar) return baixarDocumento(Number(baixar.dataset.baixarDoc));
   if (ver) return verDocumento(Number(ver.dataset.verDoc));
   const ap = e.target.closest("[data-aprovar-doc]");
   if (ap) { $("#modal-doc").open && $("#modal-doc").close(); return aprovarDoc(Number(ap.dataset.aprovarDoc)); }

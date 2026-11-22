@@ -471,10 +471,11 @@ function renderPrevia() {
     <div class="cartao-etiquetas">
       <span class="etiqueta ${f.tipo}"><i class="ti ${t.icone}"></i>${t.nome}</span>
       ${f.area ? `<span class="etiqueta" style="background:var(--superficie-2);color:var(--texto-2)">${esc(f.area)}</span>` : ""}
+      ${f.tipo === "estagio" && f.permiteNegociacaoHorario ? '<span class="etiqueta" style="background:#eef3fe;color:var(--cor-primaria)"><i class="ti ti-clock-edit"></i>Horário negociável</span>' : ""}
     </div>
     <div class="cartao-info">
       <div><i class="ti ti-cash"></i><span class="valor">${rem ? brl.format(rem) : "R$ —"}</span>/mês</div>
-      <div><i class="ti ti-clock"></i><span class="valor">${f.cargaHoraria || "—"}h</span>/semana</div>
+<div><i class="ti ti-clock"></i><span><span class="valor">${f.cargaHoraria || "—"}h</span>/semana${f.turno ? ` · ${f.turno}` : ""}</span></div>
       <div><i class="ti ${f.modalidade === "remota" ? "ti-world" : "ti-map-pin"}"></i>${f.modalidade === "remota" ? "Remota" : `Presencial · ${esc(f.regiao) || "região"}`}</div>
       <div><i class="ti ti-calendar-week"></i><span class="dias-semana">${DIAS.map((d) => `<span class="${f.dias.includes(d.id) ? "on" : ""}">${d.curto}</span>`).join("")}</span></div>
     </div>
