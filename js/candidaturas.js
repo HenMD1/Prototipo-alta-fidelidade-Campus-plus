@@ -12,7 +12,7 @@ const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<
 const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 const BASE = Radar.proximaSegunda();
 const TIPOS_ACEITOS = ["application/pdf", "image/jpeg", "image/png"];
-const TAMANHO_MAX = 5 * 1024 * 1024;
+const TAMANHO_MAX = 10 * 1024 * 1024;
 
 const clonar = (x) => JSON.parse(JSON.stringify(x));
 let proprias, agendaEst;
@@ -213,7 +213,7 @@ function renderDocs(c) {
   return `
   <div class="bloco" id="bloco-docs">
     <h3 class="secao"><i class="ti ti-folder"></i> Documentos</h3>
-    <p class="secao-sub">PDF, JPG ou PNG de até 5 MB. O ofertante confere cada arquivo.</p>
+    <p class="secao-sub">PDF, JPG ou PNG de até 10 MB. O ofertante confere cada arquivo.</p>
     <div class="docs">${c.docs.map((d, i) => `
       <div class="doc" data-doc="${i}">
         <span class="doc-ic ${d.status}"><i class="ti ${ICONE[d.status]}"></i></span>
@@ -341,7 +341,7 @@ function registrar(c, icone, texto) { c.historico.push({ haDias: 0, icone, texto
 function enviarDocumento(c, i, arquivo) {
   const d = c.docs[i];
   if (!TIPOS_ACEITOS.includes(arquivo.type)) return Radar.toast("Formato não aceito. Envie um PDF, JPG ou PNG.", "ti-alert-circle");
-  if (arquivo.size > TAMANHO_MAX) return Radar.toast("O arquivo passa de 5 MB. Envie uma versão menor.", "ti-alert-circle");
+  if (arquivo.size > TAMANHO_MAX) return Radar.toast("O arquivo passa de 10 MB. Envie uma versão menor.", "ti-alert-circle");
   d.status = "enviado";
   d.arquivo = arquivo.name;
   d.tamanho = arquivo.size > 1024 * 1024 ? `${(arquivo.size / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(arquivo.size / 1024))} KB`;

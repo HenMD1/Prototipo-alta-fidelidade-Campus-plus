@@ -57,6 +57,7 @@ const OPORTUNIDADES = [
     requisitos: ["Cursando Ciência ou Engenharia da Computação a partir do 3º semestre", "Noções de HTML, CSS e JavaScript", "Disponibilidade de 4h por dia"],
     beneficios: ["Vale-transporte", "Auxílio alimentação de R$ 25/dia", "Possibilidade de efetivação"],
     documentos: ["Histórico escolar", "Atestado de matrícula", "Currículo"],
+    turno: "Tarde", permiteNegociacaoHorario: true, cargaSemanaProvas: 10,
   },
   {
     id: 2, tipo: "bolsa", ofertante: "inf", area: "Computação",
@@ -68,6 +69,7 @@ const OPORTUNIDADES = [
     requisitos: ["Estar regularmente matriculado na UFRGS", "Não possuir outra bolsa institucional", "Conhecimentos básicos de Linux"],
     beneficios: ["Certificado de atividade", "Horário flexível entre as aulas"],
     documentos: ["Atestado de matrícula", "Comprovante de conta bancária"],
+    turno: "Flexível",
   },
   {
     id: 3, tipo: "estagio", ofertante: "finvest", area: "Dados",
@@ -79,6 +81,7 @@ const OPORTUNIDADES = [
     requisitos: ["Cursando Estatística, Economia, Computação ou áreas afins", "SQL intermediário", "Python (pandas)"],
     beneficios: ["Auxílio home office", "Plano de saúde", "Bolsa de estudos em cursos de dados"],
     documentos: ["Histórico escolar", "Currículo", "Atestado de matrícula"],
+    turno: "Tarde", permiteNegociacaoHorario: false, cargaSemanaProvas: 15,
   },
   {
     id: 4, tipo: "bolsa", ofertante: "fabico", area: "Comunicação",
@@ -90,6 +93,7 @@ const OPORTUNIDADES = [
     requisitos: ["Cursando Jornalismo, Publicidade ou Relações Públicas", "Conhecimento de edição de áudio"],
     beneficios: ["Certificado de extensão", "Horas complementares"],
     documentos: ["Atestado de matrícula", "Portfólio (opcional)"],
+    turno: "Tarde",
   },
   {
     id: 5, tipo: "estagio", ofertante: "horizonte", area: "Engenharia",
@@ -101,6 +105,7 @@ const OPORTUNIDADES = [
     requisitos: ["Cursando Engenharia Civil a partir do 6º semestre", "AutoCAD", "CNH B (desejável)"],
     beneficios: ["Vale-transporte", "Refeição no local", "Seguro de vida"],
     documentos: ["Histórico escolar", "Atestado de matrícula", "Currículo"],
+    turno: "Manhã", permiteNegociacaoHorario: false, cargaSemanaProvas: 15,
   },
   {
     id: 6, tipo: "estagio", ofertante: "pixel", area: "Design",
@@ -112,6 +117,7 @@ const OPORTUNIDADES = [
     requisitos: ["Cursando Design, Computação ou Comunicação", "Figma", "Portfólio com ao menos 2 projetos"],
     beneficios: ["Auxílio home office", "Horário flexível"],
     documentos: ["Portfólio", "Currículo", "Atestado de matrícula"],
+    turno: "Flexível", permiteNegociacaoHorario: true, cargaSemanaProvas: 10,
   },
   {
     id: 7, tipo: "estagio", ofertante: "vida", area: "Administração",
@@ -123,6 +129,7 @@ const OPORTUNIDADES = [
     requisitos: ["Cursando Administração ou Engenharia de Produção", "Excel intermediário"],
     beneficios: ["Vale-transporte", "Refeitório no local"],
     documentos: ["Histórico escolar", "Atestado de matrícula"],
+    turno: "Manhã", permiteNegociacaoHorario: true, cargaSemanaProvas: 10,
   },
   {
     id: 8, tipo: "bolsa", ofertante: "inf", area: "Computação",
@@ -134,6 +141,7 @@ const OPORTUNIDADES = [
     requisitos: ["Média harmônica acima de 7", "Python", "Ter cursado Algoritmos e Programação"],
     beneficios: ["Bolsa CNPq", "Participação em artigos científicos"],
     documentos: ["Histórico escolar", "Carta de motivação", "Atestado de matrícula"],
+    turno: "Tarde",
   },
   {
     id: 9, tipo: "emprego", ofertante: "nuvem", area: "Computação",
@@ -145,6 +153,7 @@ const OPORTUNIDADES = [
     requisitos: ["Cursando os últimos 3 semestres de Computação", "Java", "Git", "Banco de dados relacional"],
     beneficios: ["Plano de saúde e odontológico", "Vale-refeição", "Gympass"],
     documentos: ["Currículo", "Atestado de matrícula"],
+    turno: "Flexível",
   },
   {
     id: 10, tipo: "estagio", ofertante: "cafe", area: "Comunicação",
@@ -156,6 +165,7 @@ const OPORTUNIDADES = [
     requisitos: ["Cursando Publicidade, Jornalismo ou Design", "Familiaridade com Instagram e Canva"],
     beneficios: ["Vale-transporte", "Café e lanche no local"],
     documentos: ["Portfólio", "Atestado de matrícula"],
+    turno: "Tarde", permiteNegociacaoHorario: true, cargaSemanaProvas: 8,
   },
   {
     id: 11, tipo: "bolsa", ofertante: "prograd", area: "Administração",
@@ -167,6 +177,7 @@ const OPORTUNIDADES = [
     requisitos: ["Estar regularmente matriculado na UFRGS", "Boa comunicação escrita"],
     beneficios: ["Auxílio transporte", "Certificado de atividade"],
     documentos: ["Atestado de matrícula", "Comprovante de conta bancária"],
+    turno: "Manhã",
   },
   {
     id: 12, tipo: "estagio", ofertante: "redesul", area: "Computação",
@@ -178,6 +189,7 @@ const OPORTUNIDADES = [
     requisitos: ["Cursando Computação, Engenharia ou curso técnico em TI", "Noções de redes"],
     beneficios: ["Vale-transporte", "Desconto nas lojas"],
     documentos: ["Atestado de matrícula", "Currículo"],
+    turno: "Noite", permiteNegociacaoHorario: false, cargaSemanaProvas: 15,
   },
   {
     id: 13, tipo: "estagio", ofertante: "clinica", area: "Saúde",
@@ -189,6 +201,7 @@ const OPORTUNIDADES = [
     requisitos: ["Cursando Nutrição a partir do 5º semestre"],
     beneficios: ["Vale-transporte", "Supervisão de nutricionista"],
     documentos: ["Histórico escolar", "Atestado de matrícula"],
+    turno: "Manhã", permiteNegociacaoHorario: false, cargaSemanaProvas: 10,
   },
   {
     id: 14, tipo: "estagio", ofertante: "agrodata", area: "Dados",
@@ -200,6 +213,7 @@ const OPORTUNIDADES = [
     requisitos: ["Python", "Estatística básica", "Interesse em agronegócio"],
     beneficios: ["Auxílio home office", "Horário flexível"],
     documentos: ["Histórico escolar", "Currículo"],
+    turno: "Flexível", permiteNegociacaoHorario: true, cargaSemanaProvas: 10,
   },
   {
     id: 15, tipo: "bolsa", ofertante: "mat", area: "Educação",
@@ -211,6 +225,7 @@ const OPORTUNIDADES = [
     requisitos: ["Aprovação em Cálculo I com conceito A ou B"],
     beneficios: ["Certificado de monitoria", "Horas complementares"],
     documentos: ["Histórico escolar", "Atestado de matrícula"],
+    turno: "Tarde",
   },
   {
     id: 17, tipo: "estagio", ofertante: "techsul", area: "Computação",
@@ -222,6 +237,7 @@ const OPORTUNIDADES = [
     requisitos: ["Cursando Computação a partir do 4º semestre", "Linux", "Noções de Docker e Git"],
     beneficios: ["Auxílio home office", "Possibilidade de efetivação"],
     documentos: ["Histórico escolar", "Currículo", "Atestado de matrícula"],
+    turno: "Tarde", permiteNegociacaoHorario: true, cargaSemanaProvas: 10,
   },
   {
     // Encerrada: não aparece no mural (só vagas com inscrições abertas são exibidas).
@@ -232,6 +248,7 @@ const OPORTUNIDADES = [
     remuneracao: 1300, prazoDias: -2, publicadaHaDias: 20, vagas: 1, status: "encerrada",
     motivoEncerramento: "Prazo de inscrição expirado.",
     descricao: "Escrita de testes automatizados.", requisitos: [], beneficios: [], documentos: [],
+    turno: "Tarde", permiteNegociacaoHorario: false, cargaSemanaProvas: 10,
   },
 ];
 
