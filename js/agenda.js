@@ -62,6 +62,85 @@ function conflito(h, c) {
   return gradeAulas().find((a) => a.dia === dia && ini < minutos(a.fim) && fim > minutos(a.ini));
 }
 
+function conflitoEntrevista(h, c) {
+  const tDia = dataDe(h).getTime();
+  const ini1 = minutos(h.ini), fim1 = ini1 + c.duracao;
+  for (const outra of candidaturas) {
+    if (!outra || outra.id === c.id || outra.status !== "marcada" || !outra.entrevista) continue;
+    const hOutra = outra.horarios.find((x) => x.id === outra.entrevista);
+    if (!hOutra) continue;
+    if (dataDe(hOutra).getTime() !== tDia) continue;
+    const ini2 = minutos(hOutra.ini), fim2 = ini2 + (outra.duracao || 30);
+    if (ini1 < fim2 && fim1 > ini2) {
+      return { candidatura: outra, horario: hOutra, vaga: vagaDe(outra), ofertante: ofertanteDe(outra) };
+    }
+  }
+  return null;
+}
+
+function escaparICS(str) {
+  return String(str || "")
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r?\n/g, "\\n");
+}
+
+function formatarDataICS(dataObj, hhmmStr) {
+  const [hh, mm] = hhmmStr.split(":").map(Number);
+  const d = new Date(dataObj);
+  d.setHours(hh, mm, 0, 0);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+}
+
+function gerarEbaixarICS(c, h) {
+  const v = vagaDe(c);
+  const of = ofertanteDe(c);
+  const data = dataDe(h);
+  const dtStart = formatarDataICS(data, h.ini);
+  const dtEnd = formatarDataICS(data, fimDe(h, c));
+  const dtStamp = formatarDataICS(new Date(), `${String(new Date().getHours()).padStart(2, "0")}:${String(new Date().getMinutes()).padStart(2, "0")}`);
+  const uid = `campusplus-entrevista-${c.id}-${h.id}-${Date.now()}@ufrgs.br`;
+  const summary = escaparICS(`Entrevista: ${v.titulo} — ${of.nome}`);
+  const description = escaparICS(
+    `Entrevista referente à oportunidade "${v.titulo}" (${of.nome}).\n` +
+    `Formato/Local: ${c.formato}\n` +
+    `Duração: ${c.duracao} min\n` +
+    `Entrevistador: ${c.entrevistador}`
+  );
+  const location = escaparICS(c.formato);
+
+  const linhas = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Campus+ Radar de Oportunidades//PT",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    `UID:${uid}`,
+    `DTSTAMP:${dtStamp}`,
+    `DTSTART:${dtStart}`,
+    `DTEND:${dtEnd}`,
+    `SUMMARY:${summary}`,
+    `DESCRIPTION:${description}`,
+    `LOCATION:${location}`,
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+
+  const blob = new Blob([linhas], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const slug = `${v.titulo}-${of.nome}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  a.href = url;
+  a.download = `entrevista-${slug || c.id}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function prazoEscolha(c) { return Radar.somarDias(Radar.hoje(), c.prazoEscolhaDias); }
 
 /* ---------- Lista lateral ---------- */
@@ -147,11 +226,20 @@ function renderEscolher(c) {
       .sort((a, b) => minutos(a.ini) - minutos(b.ini));
     const slots = doDia.map((h) => {
       const aula = h.status === "livre" && conflito(h, c);
-      const classes = ["slot", h.status === "ocupado" ? "ocupado" : "", aula ? "conflito" : "", h.id === selecionado ? "selecionado" : ""].join(" ");
+      const ent = h.status === "livre" && conflitoEntrevista(h, c);
+      const temConflito = Boolean(aula || ent);
+      const classes = ["slot", h.status === "ocupado" ? "ocupado" : "", temConflito ? "conflito" : "", h.id === selecionado ? "selecionado" : ""].join(" ");
+      const partesTitulo = [];
+      if (aula) partesTitulo.push(`Conflita com sua aula: ${aula.disciplina} (${aula.ini}–${aula.fim})`);
+      if (ent) partesTitulo.push(`Conflita com entrevista de ${ent.vaga.titulo} (${ent.horario.ini}–${fimDe(ent.horario, ent.candidatura)})`);
       const titulo = h.status === "ocupado" ? "Horário já reservado por outro candidato"
-        : aula ? `Conflita com sua aula: ${aula.disciplina} (${aula.ini}–${aula.fim})` : "Disponível";
+        : partesTitulo.length ? partesTitulo.join(" · ") : "Disponível";
+      const rotuloCurto = aula && ent ? '<i class="ti ti-alert-triangle"></i> aula + entrevista'
+        : aula ? '<i class="ti ti-alert-triangle"></i> aula'
+        : ent ? '<i class="ti ti-alert-triangle"></i> entrevista'
+        : `até ${fimDe(h, c)}`;
       return `<button class="${classes}" data-slot="${h.id}" title="${titulo}" ${h.status === "ocupado" ? 'aria-disabled="true"' : ""} aria-pressed="${h.id === selecionado}">
-        ${h.ini}<small>${aula ? '<i class="ti ti-alert-triangle"></i> aula' : `até ${fimDe(h, c)}`}</small>
+        ${h.ini}<small>${rotuloCurto}</small>
         ${h.novo ? '<span class="selo-novo">novo</span>' : ""}
       </button>`;
     }).join("");
@@ -185,9 +273,15 @@ function renderEscolher(c) {
       <label><input type="checkbox" data-acao="ocultar" ${ocultarConflitos ? "checked" : ""}> Ocultar horários que conflitam com minhas aulas</label>
     </div>
     <div class="semana">${colunas}</div>
-    ${sel
-      ? `<div class="barra-confirmar pronta"><span>Horário selecionado: <strong>${Radar.fmtDiaLongo(dataDe(sel))}, ${sel.ini}–${fimDe(sel, c)}</strong>${conflito(sel, c) ? " · <span style='color:var(--alerta-tx)'>conflita com uma aula</span>" : ""}</span>
-         <button class="btn btn-primario" data-acao="confirmar"><i class="ti ti-calendar-check"></i> Confirmar horário</button></div>`
+    ${sel ? (() => {
+      const cAula = conflito(sel, c);
+      const cEnt = conflitoEntrevista(sel, c);
+      const avisosConflito = [];
+      if (cAula) avisosConflito.push(`conflita com uma aula (${cAula.disciplina})`);
+      if (cEnt) avisosConflito.push(`conflita com outra entrevista (${cEnt.vaga.titulo}, ${cEnt.horario.ini}–${fimDe(cEnt.horario, cEnt.candidatura)})`);
+      return `<div class="barra-confirmar pronta"><span>Horário selecionado: <strong>${Radar.fmtDiaLongo(dataDe(sel))}, ${sel.ini}–${fimDe(sel, c)}</strong>${avisosConflito.length ? ` · <span style='color:var(--alerta-tx)'>${avisosConflito.join(" e ")}</span>` : ""}</span>
+         <button class="btn btn-primario" data-acao="confirmar"><i class="ti ti-calendar-check"></i> Confirmar horário</button></div>`;
+    })()
       : `<div class="barra-confirmar"><span><i class="ti ti-hand-click"></i> ${livres ? `Selecione um dos ${livres} horários disponíveis.` : "Não há horários livres no momento."}</span></div>`}
   </div>
 
@@ -218,7 +312,9 @@ function renderMarcada(c) {
       <div><small>Entrevistador</small><strong>${c.entrevistador}</strong></div>
     </div>
     <div class="acoes">
-      <button class="btn btn-primario" data-acao="calendario"><i class="ti ti-calendar-plus"></i> Adicionar ao calendário</button>
+      ${c.adicionadoCalendario
+        ? '<button class="btn" disabled><i class="ti ti-calendar-check"></i> Entrevista adicionada ao calendário</button>'
+        : '<button class="btn btn-primario" data-acao="calendario"><i class="ti ti-calendar-plus"></i> Adicionar ao calendário</button>'}
       <button class="btn" data-acao="remarcar"><i class="ti ti-calendar-repeat"></i> Trocar horário</button>
       <button class="btn btn-texto perigo" data-acao="desistir">Desistir da vaga</button>
     </div>
@@ -299,6 +395,7 @@ function confirmarHorario() {
   h.status = "meu";                 // passo 5: sai da agenda dos demais
   h.novo = false;
   c.entrevista = h.id;
+  c.adicionadoCalendario = false;
   c.status = "marcada";             // passo 6
   c.avisos = c.avisos.filter((a) => a.tipo !== "perigo");
   selecionado = null;
@@ -419,6 +516,7 @@ const EVENTOS = {
     const motivo = "Tivemos um imprevisto na equipe e precisamos remarcar. Desculpe o transtorno!";
     c.horarios = c.horarios.filter((x) => x !== h);   // o ofertante removeu o horário
     c.entrevista = null;
+    c.adicionadoCalendario = false;
     c.status = "escolher";
     c.prazoEscolhaDias = 3;
     c.mensagens.push({ de: "ofertante", texto: motivo, quando: "agora" });
@@ -523,25 +621,36 @@ $("#detalhe").addEventListener("click", (e) => {
     case "confirmar": {
       const h = c.horarios.find((x) => x.id === selecionado);
       const aula = conflito(h, c);
+      const ent = conflitoEntrevista(h, c);
+      const alertas = [];
+      if (aula) alertas.push(`Conflita com ${aula.disciplina} (${aula.ini}–${aula.fim})`);
+      if (ent) alertas.push(`Conflita com outra entrevista em "${ent.vaga.titulo}" (${ent.horario.ini}–${fimDe(ent.horario, ent.candidatura)})`);
       $("#mc-resumo").innerHTML = `
         <div><small>Data</small><strong style="text-transform:capitalize">${Radar.fmtDiaLongo(dataDe(h))}</strong></div>
         <div><small>Horário</small><strong>${h.ini}–${fimDe(h, c)}</strong></div>
         <div style="grid-column:1/-1"><small>Formato</small><strong>${c.formato}</strong></div>
-        ${aula ? `<div style="grid-column:1/-1;background:var(--alerta-bg);border-color:#f1d7a6"><small style="color:var(--alerta-tx)">Atenção</small><strong style="color:var(--alerta-tx)">Conflita com ${aula.disciplina} (${aula.ini}–${aula.fim})</strong></div>` : ""}`;
+        ${alertas.length ? `<div style="grid-column:1/-1;background:var(--alerta-bg);border-color:#f1d7a6"><small style="color:var(--alerta-tx)">Atenção</small><strong style="color:var(--alerta-tx)">${alertas.join(" · ")}</strong></div>` : ""}`;
       $("#modal-confirmar").showModal();
       break;
     }
     case "remarcar":
       if (c.entrevista) avisarOfertante(c, `<b>${NOME_ESTUDANTE}</b> liberou o horário ${descrever(c.horarios.find((x) => x.id === c.entrevista), c)} para escolher outro.`, "ti-calendar-repeat");
       liberarHorario(c);
+      c.adicionadoCalendario = false;
       c.status = "escolher";
       c.avisos = c.avisos.filter((a) => a.acao !== "confirmar-presenca");
       salvar(); render();
       Radar.toast("Horário liberado. Escolha um novo horário na agenda.", "ti-calendar-repeat");
       break;
-    case "calendario":
-      Radar.toast("Evento adicionado ao seu calendário.", "ti-calendar-plus");
+    case "calendario": {
+      const h = c.horarios.find((x) => x.id === c.entrevista);
+      if (h) gerarEbaixarICS(c, h);
+      c.adicionadoCalendario = true;
+      salvar();
+      render();
+      Radar.toast("Arquivo .ics gerado e entrevista adicionada ao calendário.", "ti-calendar-check");
       break;
+    }
     case "conversa": abrirConversa(); break;
     case "sem-horario": abrirConversa(respostasRapidas(c)[0]); break;
     case "solicitar":
@@ -582,6 +691,7 @@ $("#md-confirmar").addEventListener("click", () => {
   }
   const c = atual();
   liberarHorario(c);
+  c.adicionadoCalendario = false;
   selecionado = null;
   c.status = "desistiu";
   c.avisos = [];
