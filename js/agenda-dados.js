@@ -39,6 +39,7 @@ const CANDIDATURAS_INICIAIS = [
       { id: 112, d: 7, ini: "09:00", status: "livre" },
       { id: 113, d: 8, ini: "14:00", status: "livre" },
       { id: 114, d: 9, ini: "10:00", status: "livre" },
+      { id: 115, d: 1, ini: "16:00", status: "livre" },
     ],
     entrevista: null, avisos: [],
     mensagens: [

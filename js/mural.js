@@ -5,7 +5,7 @@
 
 const $ = (sel) => document.querySelector(sel);
 const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
-const CARGA_MAX = 40;
+const CARGA_MAX = 30;
 
 const TURNOS = ["Manhã", "Tarde", "Noite", "Flexível"];
 
@@ -153,12 +153,37 @@ function filtrosAtivos(f) {
   return lista;
 }
 
-function renderizarPilulas(container, lista) {
+function simularContagemSemFiltro(removerFn) {
+  const estado = {
+    busca: el.busca.value,
+    carga: el.carga.value,
+    remuneracao: el.remuneracao.value,
+    modalidade: form.querySelector('input[name="modalidade"]:checked')?.value || "qualquer",
+    marcados: [...form.querySelectorAll('input[type="checkbox"]')].map((i) => ({ el: i, checked: i.checked })),
+  };
+  removerFn();
+  const qtd = OPORTUNIDADES.filter((v) => atende(v, lerFiltros())).length;
+  el.busca.value = estado.busca;
+  el.carga.value = estado.carga;
+  el.remuneracao.value = estado.remuneracao;
+  const modInput = form.querySelector(`input[name="modalidade"][value="${estado.modalidade}"]`);
+  if (modInput) modInput.checked = true;
+  estado.marcados.forEach(({ el: i, checked }) => { i.checked = checked; });
+  return qtd;
+}
+
+function renderizarPilulas(container, lista, mostrarImpacto = false) {
   container.innerHTML = "";
   lista.forEach((item) => {
     const p = document.createElement("span");
     p.className = "pilula";
-    p.innerHTML = `${item.texto}<button type="button" aria-label="Remover filtro ${item.texto}"><i class="ti ti-x"></i></button>`;
+    let rotulo = item.texto;
+    if (mostrarImpacto) {
+      const qtd = simularContagemSemFiltro(item.remover);
+      const sufixo = qtd === 1 ? "+1 vaga" : `+${qtd} vagas`;
+      rotulo = `Remover ${item.texto} (${sufixo})`;
+    }
+    p.innerHTML = `${rotulo}<button type="button" aria-label="Remover filtro ${rotulo}"><i class="ti ti-x"></i></button>`;
     p.querySelector("button").addEventListener("click", () => { item.remover(); atualizar(); });
     container.appendChild(p);
   });
@@ -256,7 +281,7 @@ function atualizar() {
     el.grade.innerHTML = "";
     el.grade.hidden = true;
     el.vazio.hidden = false;
-    renderizarPilulas(el.ativosVazio, ativos);
+    renderizarPilulas(el.ativosVazio, ativos, true);
   }
 }
 
